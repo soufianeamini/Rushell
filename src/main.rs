@@ -45,7 +45,9 @@ fn lexer(line: &String) -> Vec<Token> {
             }
         }
     }
-    list.push(Token::new(value, TokenType::WORD));
+    if !value.is_empty() {
+        list.push(Token::new(value, TokenType::WORD));
+    }
     list
 }
 
