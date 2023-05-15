@@ -1,9 +1,11 @@
 use std::io::{self, Write};
 
+#[derive(PartialEq)]
 enum TokenType {
     WORD,
     PIPE,
-    OP,
+    AND,
+    OR,
     INFILE,
     OUTFILE,
 }
@@ -25,13 +27,26 @@ impl Token {
 fn lexer(line: &String) -> Vec<Token> {
     let mut list: Vec<Token> = Vec::new();
     let mut value = String::new();
+    let mut prevc = ' ';
     for c in line.trim().chars() {
         match c {
             '|' => {
                 if !value.is_empty() {
                     list.push(Token::new(value, TokenType::WORD));
                 }
-                list.push(Token::new(String::from("|"), TokenType::PIPE));
+                if prevc == '|' {
+                    if let Some(val) = list.last() {
+                        if val.ttype != TokenType::PIPE {
+                            println!("Error: syntax error near token `{}'", val.value);
+                            return Vec::new();
+                        }
+                    }
+                    list.pop();
+                    list.push(Token::new(String::from("||"), TokenType::OR));
+                    //then add and else if last token is different from word then error as well
+                } else {
+                    list.push(Token::new(String::from("|"), TokenType::PIPE));
+                }
                 value = String::new();
             }
             ' ' => {
@@ -44,6 +59,7 @@ fn lexer(line: &String) -> Vec<Token> {
                 value.push(c);
             }
         }
+        prevc = c;
     }
     if !value.is_empty() {
         list.push(Token::new(value, TokenType::WORD));
@@ -67,7 +83,8 @@ fn main() {
         match token.ttype {
             TokenType::WORD => println!("Word"),
             TokenType::PIPE => println!("Pipe"),
-            TokenType::OP => println!("Operator"),
+            TokenType::AND => println!("And"),
+            TokenType::OR => println!("Or"),
             TokenType::INFILE => println!("Infile"),
             TokenType::OUTFILE => println!("Outfile"),
         }
