@@ -34,8 +34,9 @@ fn lexer(line: &String) -> Vec<Token> {
                 if !value.is_empty() {
                     list.push(Token::new(value, TokenType::WORD));
                 }
+                let lasttoken = list.last();
                 if prevc == '|' {
-                    if let Some(val) = list.last() {
+                    if let Some(val) = lasttoken {
                         if val.ttype != TokenType::PIPE {
                             println!("Error: syntax error near token `{}'", val.value);
                             return Vec::new();
@@ -43,7 +44,16 @@ fn lexer(line: &String) -> Vec<Token> {
                     }
                     list.pop();
                     list.push(Token::new(String::from("||"), TokenType::OR));
-                    //then add and else if last token is different from word then error as well
+                } else if lasttoken.is_some() {
+                    if let Some(val) = lasttoken {
+                        if val.ttype != TokenType::WORD {
+                            println!("Error: syntax error near token `{}'", val.value);
+                            return Vec::new();
+                        }
+                        else {
+                            list.push(Token::new(String::from("|"), TokenType::PIPE));
+                        }
+                    }
                 } else {
                     list.push(Token::new(String::from("|"), TokenType::PIPE));
                 }
