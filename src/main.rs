@@ -8,6 +8,7 @@ enum TokenType {
     OR,
     INFILE,
     OUTFILE,
+    ERROR,
 }
 
 struct Token {
@@ -34,26 +35,17 @@ fn lexer(line: &String) -> Vec<Token> {
                 if !value.is_empty() {
                     list.push(Token::new(value, TokenType::WORD));
                 }
-                let lasttoken = list.last();
-                if prevc == '|' {
-                    if let Some(val) = lasttoken {
-                        if val.ttype != TokenType::PIPE {
-                            println!("Error: syntax error near token `{}'", val.value);
-                            return Vec::new();
-                        }
-                    }
+                if list.is_empty() {
+                    println!("Error: syntax error near token `{}'", c);
+                    return Vec::new();
+                }
+                let val = list.last().unwrap();
+                if prevc == '|' && val.ttype == TokenType::PIPE {
                     list.pop();
                     list.push(Token::new(String::from("||"), TokenType::OR));
-                } else if lasttoken.is_some() {
-                    if let Some(val) = lasttoken {
-                        if val.ttype != TokenType::WORD {
+                } else if val.ttype != TokenType::WORD {
                             println!("Error: syntax error near token `{}'", val.value);
                             return Vec::new();
-                        }
-                        else {
-                            list.push(Token::new(String::from("|"), TokenType::PIPE));
-                        }
-                    }
                 } else {
                     list.push(Token::new(String::from("|"), TokenType::PIPE));
                 }
@@ -97,6 +89,7 @@ fn main() {
             TokenType::OR => println!("Or"),
             TokenType::INFILE => println!("Infile"),
             TokenType::OUTFILE => println!("Outfile"),
+            TokenType::ERROR => println!("Error"),
         }
     }
 }
