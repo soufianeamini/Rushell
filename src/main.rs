@@ -83,6 +83,9 @@ fn main() {
             .read_line(&mut line)
             .expect("Error: Unable to read from standard input");
 
+        if line.is_empty() {
+            return;
+        }
         let list = lexer(&line);
 
         for token in list {
