@@ -4,9 +4,13 @@ use std::io::{self, Write};
 enum TokenType {
     WORD,
     PIPE,
-    AND,
+    // AND,
     OR,
-    ERROR,
+    LESS,
+    LESSLESS,
+    // GREAT,
+    // GREATGREAT,
+    // ERROR,
 }
 
 struct Token {
@@ -49,6 +53,25 @@ fn lexer(line: &String) -> Vec<Token> {
                 }
                 value = String::new();
             }
+            '<' => {
+                if !value.is_empty() {
+                    list.push(Token::new(value, TokenType::WORD));
+                }
+                if let Some(val) = list.last() {
+                    if prevc == '<' && val.ttype == TokenType::LESS {
+                        list.pop();
+                        list.push(Token::new(String::from("<<"), TokenType::LESSLESS));
+                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR {
+                                println!("Error: syntax error near token `{}'", val.value);
+                                return Vec::new();
+                    } else {
+                        list.push(Token::new(String::from("<"), TokenType::LESS));
+                    }
+                } else {
+                    list.push(Token::new(String::from("<"), TokenType::LESS))
+                }
+                value = String::new();
+            }
             ' ' => {
                 if !value.is_empty() {
                     list.push(Token::new(value, TokenType::WORD));
@@ -77,7 +100,7 @@ fn main() {
     loop {
         let mut line = String::new();
 
-        print!("> ");
+        print!("$ ");
         io::stdout().flush().expect("Error: Unable to flush buffer");
         io::stdin()
             .read_line(&mut line)
@@ -93,9 +116,13 @@ fn main() {
             match token.ttype {
                 TokenType::WORD => println!("Word"),
                 TokenType::PIPE => println!("Pipe"),
-                TokenType::AND => println!("And"),
+                // TokenType::AND => println!("And"),
                 TokenType::OR => println!("Or"),
-                TokenType::ERROR => println!("Error"),
+                // TokenType::ERROR => println!("Error"),
+                TokenType::LESS => println!("Input Redirection"),
+                // TokenType::GREAT => println!("Output Redirection"),
+                TokenType::LESSLESS => println!("Input Redirection - Append"),
+                // TokenType::GREATGREAT => println!("Output Redirection - Append"),
             }
         }
     }
