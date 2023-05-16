@@ -6,8 +6,6 @@ enum TokenType {
     PIPE,
     AND,
     OR,
-    INFILE,
-    OUTFILE,
     ERROR,
 }
 
@@ -66,30 +64,36 @@ fn lexer(line: &String) -> Vec<Token> {
     if !value.is_empty() {
         list.push(Token::new(value, TokenType::WORD));
     }
+    if !list.is_empty() {
+        if list.last().unwrap().ttype != TokenType::WORD {
+            println!("Error: syntax error near token `{}'", list.last().unwrap().value);
+            return Vec::new();
+        }
+    }
     list
 }
 
 fn main() {
-    let mut line = String::new();
+    loop {
+        let mut line = String::new();
 
-    print!("> ");
-    io::stdout().flush().expect("Error: Unable to flush buffer");
-    io::stdin()
-        .read_line(&mut line)
-        .expect("Error: Unable to read from standard input");
+        print!("> ");
+        io::stdout().flush().expect("Error: Unable to flush buffer");
+        io::stdin()
+            .read_line(&mut line)
+            .expect("Error: Unable to read from standard input");
 
-    let list = lexer(&line);
+        let list = lexer(&line);
 
-    for token in list {
-        print!("Token: {} -- Type: ", token.value);
-        match token.ttype {
-            TokenType::WORD => println!("Word"),
-            TokenType::PIPE => println!("Pipe"),
-            TokenType::AND => println!("And"),
-            TokenType::OR => println!("Or"),
-            TokenType::INFILE => println!("Infile"),
-            TokenType::OUTFILE => println!("Outfile"),
-            TokenType::ERROR => println!("Error"),
+        for token in list {
+            print!("Token: {} -- Type: ", token.value);
+            match token.ttype {
+                TokenType::WORD => println!("Word"),
+                TokenType::PIPE => println!("Pipe"),
+                TokenType::AND => println!("And"),
+                TokenType::OR => println!("Or"),
+                TokenType::ERROR => println!("Error"),
+            }
         }
     }
 }
