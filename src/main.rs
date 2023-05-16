@@ -8,8 +8,8 @@ enum TokenType {
     OR,
     LESS,
     LESSLESS,
-    // GREAT,
-    // GREATGREAT,
+    GREAT,
+    GREATGREAT,
     // ERROR,
 }
 
@@ -38,7 +38,7 @@ fn lexer(line: &String) -> Vec<Token> {
                     list.push(Token::new(value, TokenType::WORD));
                 }
                 if list.is_empty() {
-                    println!("Error: syntax error near token `{}'", c);
+                    unexpected_token(&c.to_string());
                     return Vec::new();
                 }
                 let val = list.last().unwrap();
@@ -46,8 +46,8 @@ fn lexer(line: &String) -> Vec<Token> {
                     list.pop();
                     list.push(Token::new(String::from("||"), TokenType::OR));
                 } else if val.ttype != TokenType::WORD {
-                            println!("Error: syntax error near token `{}'", val.value);
-                            return Vec::new();
+                    unexpected_token(&val.value);
+                    return Vec::new();
                 } else {
                     list.push(Token::new(String::from("|"), TokenType::PIPE));
                 }
@@ -62,13 +62,32 @@ fn lexer(line: &String) -> Vec<Token> {
                         list.pop();
                         list.push(Token::new(String::from("<<"), TokenType::LESSLESS));
                     } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR {
-                                println!("Error: syntax error near token `{}'", val.value);
-                                return Vec::new();
+                        unexpected_token(&val.value);
+                        return Vec::new();
                     } else {
                         list.push(Token::new(String::from("<"), TokenType::LESS));
                     }
                 } else {
                     list.push(Token::new(String::from("<"), TokenType::LESS))
+                }
+                value = String::new();
+            }
+            '>' => {
+                if !value.is_empty() {
+                    list.push(Token::new(value, TokenType::WORD));
+                }
+                if let Some(val) = list.last() {
+                    if prevc == '>' && val.ttype == TokenType::GREAT {
+                        list.pop();
+                        list.push(Token::new(String::from(">>"), TokenType::GREATGREAT));
+                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR {
+                        unexpected_token(&val.value);
+                        return Vec::new();
+                    } else {
+                        list.push(Token::new(String::from(">"), TokenType::GREAT));
+                    }
+                } else {
+                    list.push(Token::new(String::from(">"), TokenType::GREAT))
                 }
                 value = String::new();
             }
@@ -89,11 +108,15 @@ fn lexer(line: &String) -> Vec<Token> {
     }
     if !list.is_empty() {
         if list.last().unwrap().ttype != TokenType::WORD {
-            println!("Error: syntax error near token `{}'", list.last().unwrap().value);
+            unexpected_token(&list.last().unwrap().value);
             return Vec::new();
         }
     }
     list
+}
+
+fn unexpected_token(s:&String) {
+    println!("Error: syntax error near unexpected token `{}'", s);
 }
 
 fn main() {
@@ -120,9 +143,9 @@ fn main() {
                 TokenType::OR => println!("Or"),
                 // TokenType::ERROR => println!("Error"),
                 TokenType::LESS => println!("Input Redirection"),
-                // TokenType::GREAT => println!("Output Redirection"),
+                TokenType::GREAT => println!("Output Redirection - Truncate"),
                 TokenType::LESSLESS => println!("Heredoc"),
-                // TokenType::GREATGREAT => println!("Output Redirection - Append"),
+                TokenType::GREATGREAT => println!("Output Redirection - Append"),
             }
         }
     }
