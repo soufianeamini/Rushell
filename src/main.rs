@@ -121,7 +121,7 @@ fn main() {
                 // TokenType::ERROR => println!("Error"),
                 TokenType::LESS => println!("Input Redirection"),
                 // TokenType::GREAT => println!("Output Redirection"),
-                TokenType::LESSLESS => println!("Input Redirection - Append"),
+                TokenType::LESSLESS => println!("Heredoc"),
                 // TokenType::GREATGREAT => println!("Output Redirection - Append"),
             }
         }
