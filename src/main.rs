@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::{self, Write, Seek};
 use std::process;
 
 #[derive(PartialEq,Debug)]
@@ -295,7 +295,11 @@ fn execute_commands(list: &Vec<Command>) {
 
         let mut itoutfile = command.outfiles.iter();
         while let Some(out) = itoutfile.next() {
-            let file = File::create(&out.filename).unwrap();
+            // let mut file = File::options().append(out.append).open(&out.filename).unwrap();
+            let mut file = File::create(&out.filename).unwrap();
+            // if out.append {
+            //     file.seek(io::SeekFrom::End(0)).unwrap();
+            // }
             child.stdout(process::Stdio::from(file));
         }
         // In order to handle append, try to open, and then if it doesnt exist you create the file
