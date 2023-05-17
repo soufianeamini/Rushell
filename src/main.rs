@@ -1,5 +1,6 @@
+use std::ffi::OsStr;
 use std::io::{self, Write};
-use std::process;
+use std::process::{self, ChildStdout};
 
 
 #[derive(PartialEq,Debug)]
@@ -275,14 +276,24 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
 fn execute_commands(list: &Vec<Command>) {
     let mut proc: Vec<process::Child> = Vec::new();
     let mut it = list.iter();
+    let mut prevstdout = None;
     while let Some(command) = it.next() {
-        let child = process::Command::new(&command.cmd)
-            .args(&command.args)
-            .spawn().unwrap();
-        // if it.len() > 0 {
-        //     child.stdout = process::Stdio::piped();
-        // }
-        proc.push(child);
+        let mut child = process::Command::new(&command.cmd);
+        let child = child.args(&command.args);
+        if let Some(&out) = prevstdout {
+            child.stdin(process::Stdio::piped());
+        }
+        child.stdout(process::Stdio::piped());
+
+        let mut spawn = child.spawn().unwrap();
+        prevstdout = spawn.stdout.take();
+
+        if let Some(out) = prevstdout {
+            if let Some(ref mut stdout) = spawn.stdin {
+
+            }
+        }
+        proc.push(spawn);
     }
     proc.get_mut(0).unwrap().wait().unwrap();
 }
