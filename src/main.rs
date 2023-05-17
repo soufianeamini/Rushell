@@ -272,23 +272,25 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
 }
 
 fn execute_commands(list: &Vec<Command>) {
-    let mut proc: Vec<&process::Child> = Vec::new();
+    let mut proc: Vec<process::Child> = Vec::new();
     let mut it = list.iter();
-    // let mut prevspawn: process::Child;
-    let mut prevspawn: Option<process::Child> = None;
+    let mut prevstdout: Option<process::ChildStdout> = None;
     let mut first = true;
+
     while let Some(command) = it.next() {
         let mut child = process::Command::new(&command.cmd);
         let child = child.args(&command.args);
-        if !first {
-            child.stdin(prevspawn.unwrap().stdout.unwrap());
-            first = false;
+        if first == false {
+            child.stdin(prevstdout.unwrap());
         }
-        child.stdout(process::Stdio::piped());
+        first = false;
+        if it.len() != 0 {
+            child.stdout(process::Stdio::piped());
+        }
 
-        // let mut spawn = child.spawn().unwrap();
-        let prevspawn = Some(&child.spawn().unwrap());
-        proc.push(prevspawn.unwrap());
+        let mut spawn = child.spawn().unwrap();
+        prevstdout = spawn.stdout.take();
+        proc.push(spawn);
     }
     proc.get_mut(0).unwrap().wait().unwrap();
 }
