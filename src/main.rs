@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 
-#[derive(PartialEq)]
+
+#[derive(PartialEq,Debug)]
 enum TokenType {
     WORD,
     PIPE,
@@ -13,11 +14,13 @@ enum TokenType {
     // ERROR,
 }
 
+#[derive(Debug)]
 struct Token {
     value: String,
     ttype: TokenType,
 }
 
+#[derive(Debug)]
 struct Command {
     cmd: String,
     args: Vec<String>,//subject to change depending on what type the std::Command.args takes as
@@ -183,34 +186,43 @@ fn print_tokens(list: &Vec<Token>) {
     }
 }
 
-fn parser(list: &Vec<Token>) {
+fn parser(list: &Vec<Token>) -> Vec<Command> {
+    let mut commands: Vec<Command> = Vec::new();
     let mut cmd = String::new();
     let mut args:Vec<String> = Vec::new();
-    // let mut infiles:Vec<String> = Vec::new();
+    let mut infiles:Vec<String> = Vec::new();
     // let mut outfiles:Vec<String> = Vec::new();//You need to create a struct outfile, that
     // contains either append or truncate as a flag
-    // for i in 0..list.len() {
-    //     match list[i].ttype {
-    //         TokenType::WORD => {
-    //             if cmd.is_empty() {
-    //                 cmd.clone_from(&list[i].value);
-    //             } else {
-    //                 args.push(list[i].value.clone());
-    //             }
-    //         }
-    //     }
-    // }
-    for i in 0..list.len() {
-        match list[i].ttype {
+    let mut it = list.iter();
+    while let Some(word) = it.next() {
+        match word.ttype {
             TokenType::WORD => {
                 if cmd.is_empty() {
-                    cmd.clone_from(&list[i].value);
+                    cmd.clone_from(&word.value);
                 } else {
-                    args.push(list[i].value.clone());
+                    args.push(word.value.clone());
                 }
             }
+            TokenType::LESS => {
+                let word = it.nth(0).unwrap();
+                infiles.push(word.value.clone());
+            }
+            TokenType::PIPE => {
+                commands.push(
+                    Command::new(cmd, args, infiles, Vec::new())
+                );
+                //replace the last Vec::new() with outfiles
+                cmd = String::new();
+                args = Vec::new();
+                infiles = Vec::new();
+            }
+            _ => panic!(),
         }
     }
+    commands.push(
+        Command::new(cmd, args, infiles, Vec::new())
+    );
+    commands
 }
 
 fn main() {
@@ -227,8 +239,8 @@ fn main() {
             return;
         }
         let list = lexer(&line);
-        print_tokens(&list);//Try adding handling of quotes now, before going to parsing (which
-        //handles env variables)
-        // parser(&list);
+        // print_tokens(&list);
+        let cmds = parser(&list);
+        dbg!(&cmds);
     }
 }
