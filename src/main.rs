@@ -278,7 +278,7 @@ fn execute_commands(list: &Vec<Command>) {
     let mut prevstdout: Option<process::ChildStdout> = None;
     let mut first = true;
 
-    while let Some(command) = it.next() {
+    'outer: while let Some(command) = it.next() {
         let mut child = process::Command::new(&command.cmd);
         let child = child.args(&command.args);
         if first == false {
@@ -293,12 +293,24 @@ fn execute_commands(list: &Vec<Command>) {
             child.stdout(process::Stdio::piped());
         }
 
-        // Working, but needs to handle pipes better before enabling outfiles
-        //
         let mut itoutfile = command.outfiles.iter();
         while let Some(out) = itoutfile.next() {
             let file = File::create(&out.filename).unwrap();
             child.stdout(process::Stdio::from(file));
+        }
+        // In order to handle append, try to open, and then if it doesnt exist you create the file
+        //
+        let mut itinfile = command.infiles.iter();
+        while let Some(inf) = itinfile.next() {
+            let file = match File::open(inf) {
+                Ok(file) => file,
+                Err(e) => {
+                    eprintln!("Error: {e}: {inf}");
+                    prevstdout = None;
+                    continue 'outer;
+                }
+            };
+            child.stdin(process::Stdio::from(file));
         }
 
         let mut spawn = match child.spawn() {
