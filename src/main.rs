@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::io::{self, Write};
 use std::process;
 
@@ -287,6 +288,14 @@ fn execute_commands(list: &Vec<Command>) {
         if it.len() != 0 {
             child.stdout(process::Stdio::piped());
         }
+
+        // Working, but needs to handle pipes better before enabling outfiles
+        //
+        // let mut itoutfile = command.outfiles.iter();
+        // while let Some(out) = itoutfile.next() {
+        //     let file = File::create(&out.filename).unwrap();
+        //     child.stdout(process::Stdio::from(file));
+        // }
 
         let mut spawn = child.spawn().unwrap();
         prevstdout = spawn.stdout.take();
