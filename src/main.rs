@@ -339,6 +339,10 @@ fn main() {
             .read_line(&mut line)
             .expect("Error: Unable to read from standard input");
 
+        if line.is_empty() {
+            println!("exit");
+            break;
+        }
         if line.trim().is_empty() {
             continue;
         }
