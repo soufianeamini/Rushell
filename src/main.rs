@@ -21,16 +21,22 @@ struct Token {
 }
 
 #[derive(Debug)]
+struct Outfile {
+    filename: String,
+    append: bool,//false stands for truncate, true stands for append
+}
+
+#[derive(Debug)]
 struct Command {
     cmd: String,
     args: Vec<String>,//subject to change depending on what type the std::Command.args takes as
     //arguments
     infiles: Vec<String>,
-    outfiles: Vec<String>,
+    outfiles: Vec<Outfile>,
 }
 
 impl Command {
-    fn new(cmd: String, args: Vec<String>, infiles: Vec<String>, outfiles: Vec<String>) -> Command {
+    fn new(cmd: String, args: Vec<String>, infiles: Vec<String>, outfiles: Vec<Outfile>) -> Command {
         Command {
             cmd,
             args,
@@ -45,6 +51,15 @@ impl Token {
         Token {
             value,
             ttype,
+        }
+    }
+}
+
+impl Outfile {
+    fn new(filename: String, append: bool) -> Outfile {
+        Outfile {
+            filename,
+            append,
         }
     }
 }
@@ -191,7 +206,7 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
     let mut cmd = String::new();
     let mut args:Vec<String> = Vec::new();
     let mut infiles:Vec<String> = Vec::new();
-    // let mut outfiles:Vec<String> = Vec::new();//You need to create a struct outfile, that
+    let mut outfiles:Vec<Outfile> = Vec::new();
     // contains either append or truncate as a flag
     let mut it = list.iter();
     while let Some(word) = it.next() {
@@ -207,20 +222,29 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
                 let word = it.nth(0).unwrap();
                 infiles.push(word.value.clone());
             }
+            TokenType::GREAT => {
+                let word = it.nth(0).unwrap();
+                outfiles.push(Outfile::new(word.value.clone(), false));
+            }
+            TokenType::GREATGREAT => {
+                let word = it.nth(0).unwrap();
+                outfiles.push(Outfile::new(word.value.clone(), true));
+            }
             TokenType::PIPE => {
                 commands.push(
-                    Command::new(cmd, args, infiles, Vec::new())
+                    Command::new(cmd, args, infiles, outfiles)
                 );
                 //replace the last Vec::new() with outfiles
                 cmd = String::new();
                 args = Vec::new();
                 infiles = Vec::new();
+                outfiles = Vec::new();
             }
-            _ => panic!(),
+            _ => panic!("Unhandled Token Type"),
         }
     }
     commands.push(
-        Command::new(cmd, args, infiles, Vec::new())
+        Command::new(cmd, args, infiles, outfiles)
     );
     commands
 }
@@ -235,8 +259,8 @@ fn main() {
             .read_line(&mut line)
             .expect("Error: Unable to read from standard input");
 
-        if line.is_empty() {
-            return;
+        if line.trim().is_empty() {
+            continue;
         }
         let list = lexer(&line);
         // print_tokens(&list);
