@@ -26,6 +26,12 @@ struct Outfile {
     append: bool,//false stands for truncate, true stands for append
 }
 
+
+#[derive(Debug)]
+struct Heredoc {
+    filename: String,
+    limiter: String,//false stands for truncate, true stands for append
+}
 #[derive(Debug)]
 struct Command {
     cmd: String,
@@ -33,15 +39,17 @@ struct Command {
     //arguments
     infiles: Vec<String>,
     outfiles: Vec<Outfile>,
+    heredocs: Vec<Heredoc>,
 }
 
 impl Command {
-    fn new(cmd: String, args: Vec<String>, infiles: Vec<String>, outfiles: Vec<Outfile>) -> Command {
+    fn new(cmd: String, args: Vec<String>, infiles: Vec<String>, outfiles: Vec<Outfile>, heredocs: Vec<Heredoc>) -> Command {
         Command {
             cmd,
             args,
             infiles,
             outfiles,
+            heredocs,
         }
     }
 }
@@ -60,6 +68,15 @@ impl Outfile {
         Outfile {
             filename,
             append,
+        }
+    }
+}
+
+impl Heredoc {
+    fn new(filename: String, limiter: String) -> Heredoc {
+        Heredoc {
+            filename,
+            limiter,
         }
     }
 }
@@ -207,7 +224,7 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
     let mut args:Vec<String> = Vec::new();
     let mut infiles:Vec<String> = Vec::new();
     let mut outfiles:Vec<Outfile> = Vec::new();
-    // contains either append or truncate as a flag
+    let mut heredocs:Vec<Heredoc> = Vec::new();
     let mut it = list.iter();
     while let Some(word) = it.next() {
         match word.ttype {
@@ -222,6 +239,11 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
                 let word = it.nth(0).unwrap();
                 infiles.push(word.value.clone());
             }
+            TokenType::LESSLESS => {
+                let word = it.nth(0).unwrap();
+                heredocs.push(Heredoc::new(String::from("/tmp/TemporaryHeredocName"), word.value.clone()));
+                infiles.push(String::from("/tmp/TemporaryHeredocName"))
+            }
             TokenType::GREAT => {
                 let word = it.nth(0).unwrap();
                 outfiles.push(Outfile::new(word.value.clone(), false));
@@ -232,18 +254,19 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
             }
             TokenType::PIPE => {
                 commands.push(
-                    Command::new(cmd, args, infiles, outfiles)
+                    Command::new(cmd, args, infiles, outfiles, heredocs)
                 );
                 cmd = String::new();
                 args = Vec::new();
                 infiles = Vec::new();
                 outfiles = Vec::new();
+                heredocs = Vec::new();
             }
             _ => panic!("Unhandled Token Type"),
         }
     }
     commands.push(
-        Command::new(cmd, args, infiles, outfiles)
+        Command::new(cmd, args, infiles, outfiles, heredocs)
     );
     commands
 }
