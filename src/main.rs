@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::process;
 
 
 #[derive(PartialEq,Debug)]
@@ -271,6 +272,21 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
     commands
 }
 
+fn execute_commands(list: &Vec<Command>) {
+    let mut proc: Vec<process::Child> = Vec::new();
+    let mut it = list.iter();
+    while let Some(command) = it.next() {
+        let child = process::Command::new(&command.cmd)
+            .args(&command.args)
+            .spawn().unwrap();
+        // if it.len() > 0 {
+        //     child.stdout = process::Stdio::piped();
+        // }
+        proc.push(child);
+    }
+    proc.get_mut(0).unwrap().wait().unwrap();
+}
+
 fn main() {
     loop {
         let mut line = String::new();
@@ -290,6 +306,7 @@ fn main() {
         }
         // print_tokens(&list);
         let cmds = parser(&list);
-        dbg!(&cmds);
+        execute_commands(&cmds);
+        // dbg!(&cmds);
     }
 }
