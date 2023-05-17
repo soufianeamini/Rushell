@@ -298,8 +298,7 @@ fn execute_commands(list: &Vec<Command>) {
             let file = File::options().write(true).create(true).append(out.append).open(&out.filename).unwrap();
             child.stdout(process::Stdio::from(file));
         }
-        // In order to handle append, try to open, and then if it doesnt exist you create the file
-        //
+
         let mut itinfile = command.infiles.iter();
         while let Some(inf) = itinfile.next() {
             let file = match File::open(inf) {
