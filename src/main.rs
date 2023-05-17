@@ -282,7 +282,11 @@ fn execute_commands(list: &Vec<Command>) {
         let mut child = process::Command::new(&command.cmd);
         let child = child.args(&command.args);
         if first == false {
-            child.stdin(prevstdout.unwrap());
+            if prevstdout.is_some() {
+                child.stdin(prevstdout.unwrap());
+            } else {
+                child.stdin(process::Stdio::null());
+            }
         }
         first = false;
         if it.len() != 0 {
@@ -291,17 +295,24 @@ fn execute_commands(list: &Vec<Command>) {
 
         // Working, but needs to handle pipes better before enabling outfiles
         //
-        // let mut itoutfile = command.outfiles.iter();
-        // while let Some(out) = itoutfile.next() {
-        //     let file = File::create(&out.filename).unwrap();
-        //     child.stdout(process::Stdio::from(file));
-        // }
+        let mut itoutfile = command.outfiles.iter();
+        while let Some(out) = itoutfile.next() {
+            let file = File::create(&out.filename).unwrap();
+            child.stdout(process::Stdio::from(file));
+        }
 
-        let mut spawn = child.spawn().unwrap();
+        let mut spawn = match child.spawn() {
+            Ok(spawn) => spawn,
+            Err(_) => {
+                eprintln!("Error: {}: command not found", command.cmd);
+                prevstdout = None;
+                continue;
+            }
+        };
         prevstdout = spawn.stdout.take();
         proc.push(spawn);
     }
-    for i in 0..list.len() {
+    for i in 0..proc.len() {
         proc.get_mut(i).unwrap().wait().unwrap();
     }
 }
