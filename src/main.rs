@@ -234,7 +234,6 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
                 commands.push(
                     Command::new(cmd, args, infiles, outfiles)
                 );
-                //replace the last Vec::new() with outfiles
                 cmd = String::new();
                 args = Vec::new();
                 infiles = Vec::new();
@@ -263,6 +262,9 @@ fn main() {
             continue;
         }
         let list = lexer(&line);
+        if list.is_empty() {
+            continue;
+        }
         // print_tokens(&list);
         let cmds = parser(&list);
         dbg!(&cmds);
