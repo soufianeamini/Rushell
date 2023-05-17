@@ -295,11 +295,7 @@ fn execute_commands(list: &Vec<Command>) {
 
         let mut itoutfile = command.outfiles.iter();
         while let Some(out) = itoutfile.next() {
-            // let mut file = File::options().append(out.append).open(&out.filename).unwrap();
-            let mut file = File::create(&out.filename).unwrap();
-            // if out.append {
-            //     file.seek(io::SeekFrom::End(0)).unwrap();
-            // }
+            let file = File::options().write(true).create(true).append(out.append).open(&out.filename).unwrap();
             child.stdout(process::Stdio::from(file));
         }
         // In order to handle append, try to open, and then if it doesnt exist you create the file
