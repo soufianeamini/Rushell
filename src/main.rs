@@ -57,6 +57,11 @@ fn lexer(line: &String) -> Vec<Token> {
             if c == '"' {
                 doublequotes = false;
                 //If you use this logic, you would have to expand variables inside the lexer...
+                //I guess one solution is: You can use the value and look for a substr that starts
+                //with $, and replace $expression with the new value. and then you can let the next
+                //for append it to the list
+                //
+                //Also, it's fine if it recursively expands values that start with $
             } else {
                 value.push(c);
             }
@@ -178,21 +183,35 @@ fn print_tokens(list: &Vec<Token>) {
     }
 }
 
-// fn parser(list: &Vec<Token>) {
-//     let mut cmd = String::new();
-//     let mut args:Vec<String> = Vec::new();
-//     for word in list {
-//         match word.ttype {
-//             TokenType::WORD => {
-//                 if cmd.is_empty() {
-//                     cmd.clone_from(&word.value);
-//                 } else {
-//                     args.push(word.value.clone());
-//                 }
-//             }
-//         }
-//     }
-// }
+fn parser(list: &Vec<Token>) {
+    let mut cmd = String::new();
+    let mut args:Vec<String> = Vec::new();
+    // let mut infiles:Vec<String> = Vec::new();
+    // let mut outfiles:Vec<String> = Vec::new();//You need to create a struct outfile, that
+    // contains either append or truncate as a flag
+    // for i in 0..list.len() {
+    //     match list[i].ttype {
+    //         TokenType::WORD => {
+    //             if cmd.is_empty() {
+    //                 cmd.clone_from(&list[i].value);
+    //             } else {
+    //                 args.push(list[i].value.clone());
+    //             }
+    //         }
+    //     }
+    // }
+    for i in 0..list.len() {
+        match list[i].ttype {
+            TokenType::WORD => {
+                if cmd.is_empty() {
+                    cmd.clone_from(&list[i].value);
+                } else {
+                    args.push(list[i].value.clone());
+                }
+            }
+        }
+    }
+}
 
 fn main() {
     loop {
