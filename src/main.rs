@@ -292,7 +292,9 @@ fn execute_commands(list: &Vec<Command>) {
         prevstdout = spawn.stdout.take();
         proc.push(spawn);
     }
-    proc.get_mut(0).unwrap().wait().unwrap();
+    for i in 0..list.len() {
+        proc.get_mut(i).unwrap().wait().unwrap();
+    }
 }
 
 fn main() {
