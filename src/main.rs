@@ -6,7 +6,8 @@ use std::process;
 enum TokenType {
     WORD,
     PIPE,
-    // AND,
+    AMPERSAND,
+    AND,
     OR,
     LESS,
     LESSLESS,
@@ -114,6 +115,26 @@ fn lexer(line: &String) -> Vec<Token> {
         match c {
             '"' => doublequotes = true,
             '\'' => singlequotes = true,
+            '&' => {
+                if !value.is_empty() {
+                    list.push(Token::new(value, TokenType::WORD));
+                }
+                if list.is_empty() {
+                    unexpected_token(&c.to_string());
+                    return Vec::new();
+                }
+                let val = list.last().unwrap();
+                if prevc == '&' && val.ttype == TokenType::AMPERSAND {
+                    list.pop();
+                    list.push(Token::new(String::from("&&"), TokenType::AND));
+                } else if val.ttype != TokenType::WORD {
+                    unexpected_token(&val.value);
+                    return Vec::new();
+                } else {
+                    list.push(Token::new(String::from("&"), TokenType::AMPERSAND));
+                }
+                value = String::new();
+            }
             '|' => {
                 if !value.is_empty() {
                     list.push(Token::new(value, TokenType::WORD));
@@ -142,7 +163,8 @@ fn lexer(line: &String) -> Vec<Token> {
                     if prevc == '<' && val.ttype == TokenType::LESS {
                         list.pop();
                         list.push(Token::new(String::from("<<"), TokenType::LESSLESS));
-                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR {
+                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR
+                    && val.ttype != TokenType::AMPERSAND && val.ttype != TokenType::AND {
                         unexpected_token(&val.value);
                         return Vec::new();
                     } else {
@@ -161,7 +183,8 @@ fn lexer(line: &String) -> Vec<Token> {
                     if prevc == '>' && val.ttype == TokenType::GREAT {
                         list.pop();
                         list.push(Token::new(String::from(">>"), TokenType::GREATGREAT));
-                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR {
+                    } else if val.ttype != TokenType::WORD && val.ttype != TokenType::PIPE && val.ttype != TokenType::OR
+                    && val.ttype != TokenType::AMPERSAND && val.ttype != TokenType::AND {
                         unexpected_token(&val.value);
                         return Vec::new();
                     } else {
@@ -208,7 +231,8 @@ fn print_tokens(list: &Vec<Token>) {
         match token.ttype {
             TokenType::WORD => println!("Word"),
             TokenType::PIPE => println!("Pipe"),
-            // TokenType::AND => println!("And"),
+            TokenType::AMPERSAND => println!("Ampersand"),
+            TokenType::AND => println!("And"),
             TokenType::OR => println!("Or"),
             // TokenType::ERROR => println!("Error"),
             TokenType::LESS => println!("Input Redirection"),
@@ -280,7 +304,24 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
                     }
                 }
             }
-            // _ => panic!("Unhandled Token Type"),
+            // TokenType::AND => {
+            //     commands.push(
+            //         Command::new(cmd, args, infiles, outfiles, heredocs)
+            //     );
+            //     cmd = String::new();
+            //     args = Vec::new();
+            //     infiles = Vec::new();
+            //     outfiles = Vec::new();
+            //     heredocs = Vec::new();
+            //     match execute_commands(&commands) {
+            //         0 => {
+            //             commands.clear();
+            //             continue;
+            //         }
+            //         _ => return Vec::new(),
+            //     }
+            // }
+            _ => panic!("Unhandled Token Type"),
         }
     }
     commands.push(
