@@ -294,6 +294,7 @@ fn execute_commands(list: &Vec<Command>) -> i32 {
     let mut it = list.iter();
     let mut prevstdout: Option<process::ChildStdout> = None;
     let mut first = true;
+    let mut retval = 0;
 
     'outer: while let Some(command) = it.next() {
         let mut child = process::Command::new(&command.cmd);
@@ -323,6 +324,7 @@ fn execute_commands(list: &Vec<Command>) -> i32 {
                 Err(e) => {
                     eprintln!("Error: {e}: {inf}");
                     prevstdout = None;
+                    retval = e.raw_os_error().unwrap();
                     continue 'outer;
                 }
             };
@@ -340,7 +342,6 @@ fn execute_commands(list: &Vec<Command>) -> i32 {
         prevstdout = spawn.stdout.take();
         proc.push(spawn);
     }
-    let mut retval = 0;
     for i in 0..proc.len() {
         retval = proc.get_mut(i).unwrap().wait().unwrap().code().unwrap();
     }
