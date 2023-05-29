@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, Write, Seek};
+use std::io::{self, Write};
 use std::process;
 
 #[derive(PartialEq,Debug)]
@@ -27,12 +27,12 @@ struct Outfile {
     append: bool,//false stands for truncate, true stands for append
 }
 
-
 #[derive(Debug)]
 struct Heredoc {
     filename: String,
     limiter: String,//false stands for truncate, true stands for append
 }
+
 #[derive(Debug)]
 struct Command {
     cmd: String,
@@ -263,7 +263,24 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
                 outfiles = Vec::new();
                 heredocs = Vec::new();
             }
-            _ => panic!("Unhandled Token Type"),
+            TokenType::OR => {
+                commands.push(
+                    Command::new(cmd, args, infiles, outfiles, heredocs)
+                );
+                cmd = String::new();
+                args = Vec::new();
+                infiles = Vec::new();
+                outfiles = Vec::new();
+                heredocs = Vec::new();
+                match execute_commands(&commands) {
+                    0 => return Vec::new(),
+                    _ => {//You can store this in env var later on
+                        commands.clear();
+                        continue;
+                    }
+                }
+            }
+            // _ => panic!("Unhandled Token Type"),
         }
     }
     commands.push(
@@ -272,7 +289,7 @@ fn parser(list: &Vec<Token>) -> Vec<Command> {
     commands
 }
 
-fn execute_commands(list: &Vec<Command>) {
+fn execute_commands(list: &Vec<Command>) -> i32 {
     let mut proc: Vec<process::Child> = Vec::new();
     let mut it = list.iter();
     let mut prevstdout: Option<process::ChildStdout> = None;
@@ -323,9 +340,11 @@ fn execute_commands(list: &Vec<Command>) {
         prevstdout = spawn.stdout.take();
         proc.push(spawn);
     }
+    let mut retval = 0;
     for i in 0..proc.len() {
-        proc.get_mut(i).unwrap().wait().unwrap();
+        retval = proc.get_mut(i).unwrap().wait().unwrap().code().unwrap();
     }
+    retval
 }
 
 fn main() {
