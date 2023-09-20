@@ -1,3 +1,4 @@
+use rustyline::{DefaultEditor};
 use std::fs::File;
 use std::io::{self, Write};
 use std::process;
@@ -390,14 +391,16 @@ fn execute_commands(list: &Vec<Command>) -> i32 {
 }
 
 fn main() {
+    let mut rl = DefaultEditor::new().unwrap();
     loop {
-        let mut line = String::new();
+        // let mut line = String::new();
+        let line  = rl.readline("> ").unwrap();
 
-        print!("$ ");
-        io::stdout().flush().expect("Error: Unable to flush buffer");
-        io::stdin()
-            .read_line(&mut line)
-            .expect("Error: Unable to read from standard input");
+        // print!("$ ");
+        // io::stdout().flush().expect("Error: Unable to flush buffer");
+        // io::stdin()
+        //     .read_line(&mut line)
+        //     .expect("Error: Unable to read from standard input");
 
         if line.is_empty() {
             println!("exit");
