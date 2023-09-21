@@ -1,10 +1,11 @@
-mod lexer {
+pub mod lexer {
     #[derive(PartialEq, Debug)]
     pub enum TokenType {
         WORD,
         PIPE,
     }
 
+    #[derive(Debug)]
     pub struct Token {
         pub literal: String,
         pub ttype: TokenType,

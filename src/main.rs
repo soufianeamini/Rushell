@@ -1,3 +1,4 @@
+use rushell_improved::lexer::lex;
 use rustyline::DefaultEditor;
 
 fn main() {
@@ -5,7 +6,10 @@ fn main() {
     loop {
         let line = rl.readline("> ");
         match line {
-            Ok(line) => println!("{line}"),
+            Ok(line) => {
+                let tokens = lex(&line);
+                println!("{tokens:#?}");
+            }
             Err(e) => {
                 println!("{}", e.to_string());
                 std::process::exit(1)
