@@ -29,7 +29,7 @@ mod tests {
 
         assert_eq!(tokens[0].literal, "echo");
         assert_eq!(tokens[0].ttype, TokenType::WORD);
-        assert_eq!(tokens[1].literal, "echo");
+        assert_eq!(tokens[1].literal, "ls");
         assert_eq!(tokens[1].ttype, TokenType::WORD);
     }
 }
