@@ -10,6 +10,17 @@ mod lexer {
         pub ttype: TokenType,
     }
 
+    fn push_word(value: &mut String, tokens: &mut Vec<Token>) {
+        if !value.is_empty() {
+            tokens.push(Token {
+                literal: value.clone(),
+                ttype: TokenType::WORD,
+            })
+        }
+
+        value.clear()
+    }
+
     pub fn lex(line: &str) -> Vec<Token> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut it = line.chars().into_iter().peekable();
@@ -17,27 +28,12 @@ mod lexer {
 
         while let Some(char) = it.next() {
             match char {
-                ' ' => {
-                    if !value.is_empty() {
-                        tokens.push(Token {
-                            literal: value.clone(),
-                            ttype: TokenType::WORD,
-                        });
-                        value.clear()
-                    }
-                }
+                ' ' => push_word(&mut value, &mut tokens),
                 _ => value.push(char),
             }
         }
 
-        if !value.is_empty() {
-            tokens.push(Token {
-                literal: value.clone(),
-                ttype: TokenType::WORD,
-            });
-            value.clear()
-        }
-
+        push_word(&mut value, &mut tokens);
         tokens
     }
 }
