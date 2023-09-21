@@ -1,6 +1,6 @@
 pub fn lex(line: &str) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
-    let mut it = line.chars().into_iter().peekable();
+    let mut it = line.chars().peekable();
     let mut value = String::new();
 
     while let Some(char) = it.next() {
@@ -36,4 +36,3 @@ fn push_word(value: &mut String, tokens: &mut Vec<Token>) {
 
     value.clear()
 }
-

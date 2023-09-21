@@ -11,7 +11,7 @@ fn main() {
                 println!("{tokens:#?}");
             }
             Err(e) => {
-                println!("{}", e.to_string());
+                println!("{}", e);
                 std::process::exit(1)
             }
         }
