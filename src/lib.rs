@@ -11,7 +11,34 @@ mod lexer {
     }
 
     pub fn lex(line: &str) -> Vec<Token> {
-        Vec::new()
+        let mut tokens: Vec<Token> = Vec::new();
+        let mut it = line.chars().into_iter().peekable();
+        let mut value = String::new();
+
+        while let Some(char) = it.next() {
+            match char {
+                ' ' => {
+                    if !value.is_empty() {
+                        tokens.push(Token {
+                            literal: value.clone(),
+                            ttype: TokenType::WORD,
+                        });
+                        value.clear()
+                    }
+                }
+                _ => value.push(char),
+            }
+        }
+
+        if !value.is_empty() {
+            tokens.push(Token {
+                literal: value.clone(),
+                ttype: TokenType::WORD,
+            });
+            value.clear()
+        }
+
+        tokens
     }
 }
 
