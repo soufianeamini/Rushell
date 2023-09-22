@@ -5,6 +5,10 @@ pub fn lex(line: &str) -> Vec<Token> {
 
     while let Some(char) = it.next() {
         match char {
+            '|' => {
+                push_word(&mut value, &mut tokens);
+                tokens.push(Token { literal: String::from("pipe"), ttype: TokenType::PIPE });
+            }
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
         }
