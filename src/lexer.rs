@@ -7,7 +7,10 @@ pub fn lex(line: &str) -> Vec<Token> {
         match char {
             '|' => {
                 push_word(&mut value, &mut tokens);
-                tokens.push(Token { literal: String::from("pipe"), ttype: TokenType::PIPE });
+                tokens.push(Token {
+                    literal: String::from("pipe"),
+                    ttype: TokenType::PIPE,
+                });
             }
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
