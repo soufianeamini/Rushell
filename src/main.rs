@@ -11,8 +11,13 @@ fn main() {
                 println!("{tokens:#?}");
             }
             Err(e) => {
-                println!("{}", e);
-                std::process::exit(1)
+                match e.to_string().as_str() {
+                    "Interrupted" => continue,
+                    &_ => {
+                        println!("{}", e);
+                        std::process::exit(1)
+                    }
+                }
             }
         }
     }
