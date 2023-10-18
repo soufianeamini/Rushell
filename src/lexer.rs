@@ -9,7 +9,10 @@ pub fn lex(line: &str) -> Vec<Token> {
 
     while let Some(char) = it.next() {
         match char {
-            '|' => generate_repeatable_token(LexerOpt::new("pipe", PIPE, "or", OR), '|', &mut it, &mut value, &mut tokens),
+            '|' => {
+                let opt = LexerOpt::new("pipe", PIPE, "or", OR);
+                generate_repeatable_token(opt, '|', &mut it, &mut value, &mut tokens);
+            }
             '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
             '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
@@ -21,10 +24,6 @@ pub fn lex(line: &str) -> Vec<Token> {
     push_word(&mut value, &mut tokens);
     tokens
 }
-
-// Ok so the way to refactor this, is to make a struct that contains the "happy" path for token
-// and the repeat token names, and then you'd pass that in to the function, as well ass the char to
-// check for, and the &mut value and &mut tokens obviously
 
 #[derive(PartialEq, Debug)]
 pub enum TokenType {
