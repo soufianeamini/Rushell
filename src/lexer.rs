@@ -9,14 +9,7 @@ pub fn lex(line: &str) -> Vec<Token> {
 
     while let Some(char) = it.next() {
         match char {
-            '|' => {
-                if it.peek().is_some() && *it.peek().unwrap() == '|' {
-                    generate_token("or", OR, &mut value, &mut tokens);
-                    it.next();
-                } else {
-                    generate_token("pipe", PIPE, &mut value, &mut tokens);
-                }
-            }
+            '|' => generate_repeatable_token(LexerOpt::new("pipe", PIPE, "or", OR), '|', &mut it, &mut value, &mut tokens),
             '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
             '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
@@ -66,17 +59,28 @@ struct LexerOpt {
 }
 
 impl LexerOpt {
-    fn new(l1: &str, t1: TokenType, l2: &str, t2: TokenType) -> LexerOpt {
+    fn new(
+        single_literal: &str,
+        single_type: TokenType,
+        repeat_literal: &str,
+        repeat_type: TokenType,
+    ) -> LexerOpt {
         LexerOpt {
-            single_literal: String::from(l1),
-            single_type: t1,
-            repeat_literal: String::from(l2),
-            repeat_type: t2,
+            single_literal: String::from(single_literal),
+            single_type,
+            repeat_literal: String::from(repeat_literal),
+            repeat_type,
         }
     }
 }
 
-fn generate_repeatable_token(opt: LexerOpt, char_check: char, it: &mut Peekable<Chars> ,value: &mut String, tokens: &mut Vec<Token>) {
+fn generate_repeatable_token(
+    opt: LexerOpt,
+    char_check: char,
+    it: &mut Peekable<Chars>,
+    value: &mut String,
+    tokens: &mut Vec<Token>,
+) {
     if it.peek().is_some() && *it.peek().unwrap() == char_check {
         generate_token(&opt.repeat_literal, opt.repeat_type, value, tokens);
         it.next();
