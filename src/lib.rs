@@ -208,4 +208,90 @@ mod lexer_tests {
         assert_eq!(tokens[4].literal, "echo");
         assert_eq!(tokens[4].ttype, WORD);
     }
+
+    #[test]
+    fn ampersand_only() {
+        let line = "& &     &   &";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, AMPERSAND);
+        assert_eq!(tokens[1].ttype, AMPERSAND);
+        assert_eq!(tokens[2].ttype, AMPERSAND);
+        assert_eq!(tokens[3].ttype, AMPERSAND);
+    }
+
+    #[test]
+    fn words_and_ampersand() {
+        let line = "cat  & Cargo.toml grep & rusty";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "cat");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, AMPERSAND);
+        assert_eq!(tokens[2].literal, "Cargo.toml");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].literal, "grep");
+        assert_eq!(tokens[3].ttype, WORD);
+        assert_eq!(tokens[4].ttype, AMPERSAND);
+        assert_eq!(tokens[5].literal, "rusty");
+        assert_eq!(tokens[5].ttype, WORD);
+    }
+
+    #[test]
+    fn sticky_ampersand() {
+        let line = "echo&echo&echo";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "echo");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, AMPERSAND);
+        assert_eq!(tokens[2].literal, "echo");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].ttype, AMPERSAND);
+        assert_eq!(tokens[4].literal, "echo");
+        assert_eq!(tokens[4].ttype, WORD);
+    }
+
+    #[test]
+    fn and_only() {
+        let line = "&& &&     &&   &&";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, AND);
+        assert_eq!(tokens[1].ttype, AND);
+        assert_eq!(tokens[2].ttype, AND);
+        assert_eq!(tokens[3].ttype, AND);
+    }
+
+    #[test]
+    fn words_and_and() {
+        let line = "cat  && Cargo.toml grep && rusty";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "cat");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, AND);
+        assert_eq!(tokens[2].literal, "Cargo.toml");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].literal, "grep");
+        assert_eq!(tokens[3].ttype, WORD);
+        assert_eq!(tokens[4].ttype, AND);
+        assert_eq!(tokens[5].literal, "rusty");
+        assert_eq!(tokens[5].ttype, WORD);
+    }
+
+    #[test]
+    fn sticky_and() {
+        let line = "echo&&echo&&echo";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "echo");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, AND);
+        assert_eq!(tokens[2].literal, "echo");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].ttype, AND);
+        assert_eq!(tokens[4].literal, "echo");
+        assert_eq!(tokens[4].ttype, WORD);
+    }
 }

@@ -9,6 +9,10 @@ pub fn lex(line: &str) -> Vec<Token> {
 
     while let Some(char) = it.next() {
         match char {
+            '&' => {
+                let opt = LexerOpt::new("background token", AMPERSAND, "and", AND);
+                generate_repeatable_token(opt, '&', &mut it, &mut value, &mut tokens);
+            }
             '|' => {
                 let opt = LexerOpt::new("pipe", PIPE, "or", OR);
                 generate_repeatable_token(opt, '|', &mut it, &mut value, &mut tokens);
@@ -29,10 +33,12 @@ pub fn lex(line: &str) -> Vec<Token> {
 pub enum TokenType {
     WORD,
     PIPE,
+    AMPERSAND,
     LESS,
     GREAT,
     SEMICOLON,
     OR,
+    AND,
 }
 
 #[derive(Debug)]
