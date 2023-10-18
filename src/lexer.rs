@@ -8,14 +8,12 @@ pub fn lex(line: &str) -> Vec<Token> {
     while let Some(char) = it.next() {
         match char {
             '|' => {
-                if let Some(peeked_char) = it.peek() {
-                    if *peeked_char == '|' {
-                        generate_token("or", OR, &mut value, &mut tokens);
-                        it.next();
-                        continue;
-                    }
-                } 
-                generate_token("pipe", PIPE, &mut value, &mut tokens);
+                if it.peek().is_some() && *it.peek().unwrap() == '|' {
+                    generate_token("or", OR, &mut value, &mut tokens);
+                    it.next();
+                } else {
+                    generate_token("pipe", PIPE, &mut value, &mut tokens);
+                }
             }
             '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
             '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
