@@ -7,10 +7,9 @@ pub fn lex(line: &str) -> Vec<Token> {
 
     while let Some(char) = it.next() {
         match char {
-            '|' => {
-                push_word(&mut value, &mut tokens);
-                tokens.push(Token::new("pipe", PIPE));
-            }
+            '|' => generate_token("pipe", PIPE, &mut value, &mut tokens),
+            '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
+            '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
         }
@@ -24,6 +23,8 @@ pub fn lex(line: &str) -> Vec<Token> {
 pub enum TokenType {
     WORD,
     PIPE,
+    LESS,
+    GREAT,
 }
 
 #[derive(Debug)]
@@ -39,6 +40,11 @@ impl Token {
             ttype,
         }
     }
+}
+
+fn generate_token(literal: &str, ttype: TokenType, value: &mut String, tokens: &mut Vec<Token>) {
+    push_word(value, tokens);
+    tokens.push(Token::new(literal, ttype));
 }
 
 fn push_word(value: &mut String, tokens: &mut Vec<Token>) {

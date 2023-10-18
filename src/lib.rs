@@ -2,7 +2,7 @@ pub mod lexer;
 
 #[cfg(test)]
 mod lexer_tests {
-    use crate::lexer::TokenType;
+    use crate::lexer::TokenType::*;
 
     use super::*;
 
@@ -13,9 +13,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, TokenType::WORD);
+        assert_eq!(tokens[0].ttype, WORD);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, TokenType::WORD);
+        assert_eq!(tokens[1].ttype, WORD);
     }
 
     #[test]
@@ -25,9 +25,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, TokenType::WORD);
+        assert_eq!(tokens[0].ttype, WORD);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, TokenType::WORD);
+        assert_eq!(tokens[1].ttype, WORD);
     }
 
     #[test]
@@ -37,9 +37,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, TokenType::WORD);
+        assert_eq!(tokens[0].ttype, WORD);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, TokenType::WORD);
+        assert_eq!(tokens[1].ttype, WORD);
     }
 
     #[test]
@@ -48,7 +48,7 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         for i in 0..4 {
-            assert_eq!(tokens[i].ttype, TokenType::PIPE);
+            assert_eq!(tokens[i].ttype, PIPE);
         }
     }
 
@@ -58,14 +58,14 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, TokenType::WORD);
+        assert_eq!(tokens[0].ttype, WORD);
         assert_eq!(tokens[1].literal, "Cargo.toml");
-        assert_eq!(tokens[1].ttype, TokenType::WORD);
-        assert_eq!(tokens[2].ttype, TokenType::PIPE);
+        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[2].ttype, PIPE);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, TokenType::WORD);
+        assert_eq!(tokens[3].ttype, WORD);
         assert_eq!(tokens[4].literal, "rusty");
-        assert_eq!(tokens[4].ttype, TokenType::WORD);
+        assert_eq!(tokens[4].ttype, WORD);
     }
 
     #[test]
@@ -74,9 +74,52 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, TokenType::WORD);
-        assert_eq!(tokens[1].ttype, TokenType::PIPE);
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, PIPE);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, TokenType::WORD);
+        assert_eq!(tokens[2].ttype, WORD);
+    }
+
+    #[test]
+    fn redirections_only() {
+        let line = "< >     <   >";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, LESS);
+        assert_eq!(tokens[1].ttype, GREAT);
+        assert_eq!(tokens[2].ttype, LESS);
+        assert_eq!(tokens[3].ttype, GREAT);
+    }
+
+    #[test]
+    fn words_and_redirections() {
+        let line = "cat  < Cargo.toml grep > rusty";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "cat");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, LESS);
+        assert_eq!(tokens[2].literal, "Cargo.toml");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].literal, "grep");
+        assert_eq!(tokens[3].ttype, WORD);
+        assert_eq!(tokens[4].ttype, GREAT);
+        assert_eq!(tokens[5].literal, "rusty");
+        assert_eq!(tokens[5].ttype, WORD);
+    }
+
+    #[test]
+    fn sticky_redirections() {
+        let line = "echo<echo>echo";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "echo");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, LESS);
+        assert_eq!(tokens[2].literal, "echo");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].ttype, GREAT);
+        assert_eq!(tokens[4].literal, "echo");
+        assert_eq!(tokens[4].ttype, WORD);
     }
 }

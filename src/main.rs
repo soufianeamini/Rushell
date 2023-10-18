@@ -15,7 +15,7 @@ fn main() {
             Err(e) => match e.to_string().as_str() {
                 "Interrupted" => continue,
                 &_ => {
-                    println!("{}", e);
+                    println!("{e}");
                     process::exit(1)
                 }
             },
