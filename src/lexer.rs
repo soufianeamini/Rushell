@@ -1,3 +1,5 @@
+use TokenType::*;
+
 pub fn lex(line: &str) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
     let mut it = line.chars().peekable();
@@ -7,10 +9,7 @@ pub fn lex(line: &str) -> Vec<Token> {
         match char {
             '|' => {
                 push_word(&mut value, &mut tokens);
-                tokens.push(Token {
-                    literal: String::from("pipe"),
-                    ttype: TokenType::PIPE,
-                });
+                tokens.push(Token::new("pipe", PIPE));
             }
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
@@ -33,12 +32,18 @@ pub struct Token {
     pub ttype: TokenType,
 }
 
+impl Token {
+    fn new(literal: &str, ttype: TokenType) -> Token {
+        Token {
+            literal: String::from(literal),
+            ttype,
+        }
+    }
+}
+
 fn push_word(value: &mut String, tokens: &mut Vec<Token>) {
     if !value.is_empty() {
-        tokens.push(Token {
-            literal: value.clone(),
-            ttype: TokenType::WORD,
-        })
+        tokens.push(Token::new(value, WORD))
     }
 
     value.clear()
