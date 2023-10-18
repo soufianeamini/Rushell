@@ -27,6 +27,7 @@ pub enum TokenType {
     LESS,
     GREAT,
     SEMICOLON,
+    OR,
 }
 
 #[derive(Debug)]
