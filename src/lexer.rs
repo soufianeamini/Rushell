@@ -10,6 +10,7 @@ pub fn lex(line: &str) -> Vec<Token> {
             '|' => generate_token("pipe", PIPE, &mut value, &mut tokens),
             '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
             '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
+            ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
         }
@@ -25,6 +26,7 @@ pub enum TokenType {
     PIPE,
     LESS,
     GREAT,
+    SEMICOLON,
 }
 
 #[derive(Debug)]

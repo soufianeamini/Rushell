@@ -122,4 +122,47 @@ mod lexer_tests {
         assert_eq!(tokens[4].literal, "echo");
         assert_eq!(tokens[4].ttype, WORD);
     }
+
+    #[test]
+    fn semicolons_only() {
+        let line = "; ;     ;   ;";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, SEMICOLON);
+        assert_eq!(tokens[1].ttype, SEMICOLON);
+        assert_eq!(tokens[2].ttype, SEMICOLON);
+        assert_eq!(tokens[3].ttype, SEMICOLON);
+    }
+
+    #[test]
+    fn words_and_semicolons() {
+        let line = "cat  ; Cargo.toml grep ; rusty";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "cat");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, SEMICOLON);
+        assert_eq!(tokens[2].literal, "Cargo.toml");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].literal, "grep");
+        assert_eq!(tokens[3].ttype, WORD);
+        assert_eq!(tokens[4].ttype, SEMICOLON);
+        assert_eq!(tokens[5].literal, "rusty");
+        assert_eq!(tokens[5].ttype, WORD);
+    }
+
+    #[test]
+    fn sticky_semicolons() {
+        let line = "echo;echo;echo";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "echo");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].ttype, SEMICOLON);
+        assert_eq!(tokens[2].literal, "echo");
+        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[3].ttype, SEMICOLON);
+        assert_eq!(tokens[4].literal, "echo");
+        assert_eq!(tokens[4].ttype, WORD);
+    }
 }
