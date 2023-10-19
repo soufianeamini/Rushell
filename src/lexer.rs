@@ -39,8 +39,10 @@ pub fn lex(line: &str) -> Vec<Token> {
                         break;
                     }
                 }
-                // tokens.clear();
-                // tokens.push(Token::new("Unclosed doublequotes", ERROR));
+                if it.peek().is_none() && !value.ends_with('"') {
+                    tokens.clear();
+                    tokens.push(Token::new("Unclosed doublequotes", ERROR));
+                }
             }
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
             ' ' => push_word(&mut value, &mut tokens),

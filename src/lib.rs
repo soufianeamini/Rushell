@@ -325,4 +325,13 @@ mod lexer_tests {
         assert_eq!(tokens[0].literal, "test\" Samini \"test");
         assert_eq!(tokens[0].ttype, WORD);
     }
+
+    #[test]
+    fn double_quotes_error() {
+        let line = "test\" Samini test";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "Unclosed doublequotes");
+        assert_eq!(tokens[0].ttype, ERROR);
+    }
 }
