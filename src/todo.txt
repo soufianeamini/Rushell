@@ -8,4 +8,4 @@ TODO: to handle double quotes, just enable a state where if you're inside a doub
       When encountering a doublequote or a singlequote, just keep appending to the value variable until you encounter
       the closing appropriate quote, without even generating a token (neither in the beginning nor the end)
 
-So the plan is: Lexer -> Expansion -> File handling -> Execution
+So the plan is: Lexer -> Expansion -> Delete Quotes (', ") -> File handling -> Execution
