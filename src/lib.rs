@@ -305,4 +305,24 @@ mod lexer_tests {
         assert_eq!(tokens[2].ttype, LESSLESS);
         assert_eq!(tokens[3].ttype, GREATGREAT);
     }
+
+    #[test]
+    fn double_quotes() {
+        let line = "test \" Samini \"";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "test");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].literal, "\" Samini \"");
+        assert_eq!(tokens[1].ttype, WORD);
+    }
+
+    #[test]
+    fn double_quotes_complex() {
+        let line = "test\" Samini \"test";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "test\" Samini \"test");
+        assert_eq!(tokens[0].ttype, WORD);
+    }
 }
