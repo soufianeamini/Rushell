@@ -1,0 +1,2 @@
+TODO: to handle double quotes, just enable a state where if you're inside a double quote, 
+    you don't generate a token after a whitespace
