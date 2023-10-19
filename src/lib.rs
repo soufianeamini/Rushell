@@ -294,4 +294,15 @@ mod lexer_tests {
         assert_eq!(tokens[4].literal, "echo");
         assert_eq!(tokens[4].ttype, WORD);
     }
+
+    #[test]
+    fn heredoc_and_append_only() {
+        let line = "<< >>     <<   >>";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, LESSLESS);
+        assert_eq!(tokens[1].ttype, GREATGREAT);
+        assert_eq!(tokens[2].ttype, LESSLESS);
+        assert_eq!(tokens[3].ttype, GREATGREAT);
+    }
 }

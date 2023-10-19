@@ -17,8 +17,14 @@ pub fn lex(line: &str) -> Vec<Token> {
                 let opt = LexerOpt::new("pipe", PIPE, "or", OR);
                 generate_repeatable_token(opt, '|', &mut it, &mut value, &mut tokens);
             }
-            '<' => generate_token("input redirection", LESS, &mut value, &mut tokens),
-            '>' => generate_token("output redirection", GREAT, &mut value, &mut tokens),
+            '<' => {
+                let opt = LexerOpt::new("input redirection", LESS, "heredoc", LESSLESS);
+                generate_repeatable_token(opt, '<', &mut it, &mut value, &mut tokens);
+            }
+            '>' => {
+                let opt = LexerOpt::new("output redirection", GREAT, "output redirection - append", GREATGREAT);
+                generate_repeatable_token(opt, '>', &mut it, &mut value, &mut tokens);
+            }
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
@@ -36,6 +42,8 @@ pub enum TokenType {
     AMPERSAND,
     LESS,
     GREAT,
+    LESSLESS,
+    GREATGREAT,
     SEMICOLON,
     OR,
     AND,
