@@ -22,7 +22,12 @@ pub fn lex(line: &str) -> Vec<Token> {
                 generate_repeatable_token(opt, '<', &mut it, &mut value, &mut tokens);
             }
             '>' => {
-                let opt = LexerOpt::new("output redirection", GREAT, "output redirection - append", GREATGREAT);
+                let opt = LexerOpt::new(
+                    "output redirection",
+                    GREAT,
+                    "output redirection - append",
+                    GREATGREAT,
+                );
                 generate_repeatable_token(opt, '>', &mut it, &mut value, &mut tokens);
             }
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
