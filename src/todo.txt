@@ -1,2 +1,7 @@
 TODO: to handle double quotes, just enable a state where if you're inside a double quote, 
     you don't generate a token after a whitespace
+    Following that, you actually keep the tokens as words, but they would contain spaces, doublequotes
+    Only after that, you'd pass over the WORD tokens and then reconstruct them appropriately, depending on doublequotes,
+    singlequotes, and env variable expansions
+
+So the plan is: Lexer -> Expansion -> File handling -> Execution
