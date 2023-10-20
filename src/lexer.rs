@@ -30,18 +30,18 @@ pub fn lex(line: &str) -> Vec<Token> {
                 );
                 generate_repeatable_token(opt, '>', &mut it, &mut value, &mut tokens);
             }
-            '"' => {
-                // Make it work first, and then refactor it into a function
+            '"' | '\'' => {
                 value.push(char);
-                while let Some(c) = it.next() {
+                for c in it.by_ref() {
                     value.push(c);
-                    if c == '"' {
+                    if c == char {
                         break;
                     }
                 }
-                if it.peek().is_none() && !value.ends_with('"') {
+                if it.peek().is_none() && !value.ends_with(char) {
                     tokens.clear();
-                    tokens.push(Token::new("Unclosed doublequotes", ERROR));
+                    tokens.push(Token::new("Unclosed quotes", ERROR));
+                    return tokens
                 }
             }
             ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),

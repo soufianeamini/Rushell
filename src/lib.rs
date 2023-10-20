@@ -331,7 +331,36 @@ mod lexer_tests {
         let line = "test\" Samini test";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "Unclosed doublequotes");
+        assert_eq!(tokens[0].literal, "Unclosed quotes");
+        assert_eq!(tokens[0].ttype, ERROR);
+    }
+
+    #[test]
+    fn single_quotes() {
+        let line = "test ' Samini '";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "test");
+        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[1].literal, "' Samini '");
+        assert_eq!(tokens[1].ttype, WORD);
+    }
+
+    #[test]
+    fn single_quotes_complex() {
+        let line = "test' Samini 'test";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "test' Samini 'test");
+        assert_eq!(tokens[0].ttype, WORD);
+    }
+
+    #[test]
+    fn single_quotes_error() {
+        let line = "test' Samini test";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].literal, "Unclosed quotes");
         assert_eq!(tokens[0].ttype, ERROR);
     }
 }
