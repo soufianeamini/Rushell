@@ -10,23 +10,23 @@ pub fn lex(line: &str) -> Vec<Token> {
     while let Some(char) = it.next() {
         match char {
             '&' => {
-                let opt = LexerOpt::new("background token", AMPERSAND, "and", AND);
+                let opt = LexerOpt::new("background token", Ampersand, "and", And);
                 generate_repeatable_token(opt, '&', &mut it, &mut value, &mut tokens);
             }
             '|' => {
-                let opt = LexerOpt::new("pipe", PIPE, "or", OR);
+                let opt = LexerOpt::new("pipe", Pipe, "or", Or);
                 generate_repeatable_token(opt, '|', &mut it, &mut value, &mut tokens);
             }
             '<' => {
-                let opt = LexerOpt::new("input redirection", LESS, "heredoc", LESSLESS);
+                let opt = LexerOpt::new("input redirection", Less, "heredoc", LessLess);
                 generate_repeatable_token(opt, '<', &mut it, &mut value, &mut tokens);
             }
             '>' => {
                 let opt = LexerOpt::new(
                     "output redirection",
-                    GREAT,
+                    Great,
                     "output redirection - append",
-                    GREATGREAT,
+                    GreatGreat,
                 );
                 generate_repeatable_token(opt, '>', &mut it, &mut value, &mut tokens);
             }
@@ -40,11 +40,13 @@ pub fn lex(line: &str) -> Vec<Token> {
                 }
                 if it.peek().is_none() && !value.ends_with(char) {
                     tokens.clear();
-                    tokens.push(Token::new("Unclosed quotes", ERROR));
-                    return tokens
+                    tokens.push(Token::new("Unclosed quotes", Error));
+                    return tokens;
                 }
             }
-            ';' => generate_token("semicolon", SEMICOLON, &mut value, &mut tokens),
+            ';' => generate_token("semicolon", Semicolon, &mut value, &mut tokens),
+            '(' => generate_token("left parentheses", LeftParen, &mut value, &mut tokens),
+            ')' => generate_token("right parentheses", RightParen, &mut value, &mut tokens),
             ' ' => push_word(&mut value, &mut tokens),
             _ => value.push(char),
         }
@@ -56,17 +58,19 @@ pub fn lex(line: &str) -> Vec<Token> {
 
 #[derive(PartialEq, Debug)]
 pub enum TokenType {
-    WORD,
-    PIPE,
-    AMPERSAND,
-    LESS,
-    GREAT,
-    LESSLESS,
-    GREATGREAT,
-    SEMICOLON,
-    OR,
-    AND,
-    ERROR,
+    Word,
+    Pipe,
+    Ampersand,
+    Less,
+    Great,
+    LessLess,
+    GreatGreat,
+    Semicolon,
+    Or,
+    And,
+    LeftParen,
+    RightParen,
+    Error,
 }
 
 #[derive(Debug)]
@@ -129,7 +133,7 @@ fn generate_token(literal: &str, ttype: TokenType, value: &mut String, tokens: &
 
 fn push_word(value: &mut String, tokens: &mut Vec<Token>) {
     if !value.is_empty() {
-        tokens.push(Token::new(value, WORD))
+        tokens.push(Token::new(value, Word))
     }
 
     value.clear()

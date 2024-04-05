@@ -13,9 +13,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[1].ttype, Word);
     }
 
     #[test]
@@ -25,9 +25,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[1].ttype, Word);
     }
 
     #[test]
@@ -37,9 +37,9 @@ mod lexer_tests {
         let tokens = lexer::lex(line);
 
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[1].ttype, Word);
     }
 
     #[test]
@@ -48,7 +48,7 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         for i in 0..4 {
-            assert_eq!(tokens[i].ttype, PIPE);
+            assert_eq!(tokens[i].ttype, Pipe);
         }
     }
 
@@ -58,14 +58,14 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "Cargo.toml");
-        assert_eq!(tokens[1].ttype, WORD);
-        assert_eq!(tokens[2].ttype, PIPE);
+        assert_eq!(tokens[1].ttype, Word);
+        assert_eq!(tokens[2].ttype, Pipe);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
+        assert_eq!(tokens[3].ttype, Word);
         assert_eq!(tokens[4].literal, "rusty");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -74,10 +74,10 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, PIPE);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Pipe);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
     }
 
     #[test]
@@ -85,10 +85,10 @@ mod lexer_tests {
         let line = "< >     <   >";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, LESS);
-        assert_eq!(tokens[1].ttype, GREAT);
-        assert_eq!(tokens[2].ttype, LESS);
-        assert_eq!(tokens[3].ttype, GREAT);
+        assert_eq!(tokens[0].ttype, Less);
+        assert_eq!(tokens[1].ttype, Great);
+        assert_eq!(tokens[2].ttype, Less);
+        assert_eq!(tokens[3].ttype, Great);
     }
 
     #[test]
@@ -97,15 +97,15 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, LESS);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Less);
         assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
-        assert_eq!(tokens[4].ttype, GREAT);
+        assert_eq!(tokens[3].ttype, Word);
+        assert_eq!(tokens[4].ttype, Great);
         assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, WORD);
+        assert_eq!(tokens[5].ttype, Word);
     }
 
     #[test]
@@ -114,13 +114,13 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, LESS);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Less);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
-        assert_eq!(tokens[3].ttype, GREAT);
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, Great);
         assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -128,10 +128,10 @@ mod lexer_tests {
         let line = "; ;     ;   ;";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, SEMICOLON);
-        assert_eq!(tokens[1].ttype, SEMICOLON);
-        assert_eq!(tokens[2].ttype, SEMICOLON);
-        assert_eq!(tokens[3].ttype, SEMICOLON);
+        assert_eq!(tokens[0].ttype, Semicolon);
+        assert_eq!(tokens[1].ttype, Semicolon);
+        assert_eq!(tokens[2].ttype, Semicolon);
+        assert_eq!(tokens[3].ttype, Semicolon);
     }
 
     #[test]
@@ -140,15 +140,15 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, SEMICOLON);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Semicolon);
         assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
-        assert_eq!(tokens[4].ttype, SEMICOLON);
+        assert_eq!(tokens[3].ttype, Word);
+        assert_eq!(tokens[4].ttype, Semicolon);
         assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, WORD);
+        assert_eq!(tokens[5].ttype, Word);
     }
 
     #[test]
@@ -157,13 +157,13 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, SEMICOLON);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Semicolon);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
-        assert_eq!(tokens[3].ttype, SEMICOLON);
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, Semicolon);
         assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -171,10 +171,10 @@ mod lexer_tests {
         let line = "|| ||     ||   ||";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, OR);
-        assert_eq!(tokens[1].ttype, OR);
-        assert_eq!(tokens[2].ttype, OR);
-        assert_eq!(tokens[3].ttype, OR);
+        assert_eq!(tokens[0].ttype, Or);
+        assert_eq!(tokens[1].ttype, Or);
+        assert_eq!(tokens[2].ttype, Or);
+        assert_eq!(tokens[3].ttype, Or);
     }
 
     #[test]
@@ -183,15 +183,15 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, OR);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Or);
         assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
-        assert_eq!(tokens[4].ttype, OR);
+        assert_eq!(tokens[3].ttype, Word);
+        assert_eq!(tokens[4].ttype, Or);
         assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, WORD);
+        assert_eq!(tokens[5].ttype, Word);
     }
 
     #[test]
@@ -200,13 +200,13 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, OR);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Or);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
-        assert_eq!(tokens[3].ttype, OR);
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, Or);
         assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -214,10 +214,10 @@ mod lexer_tests {
         let line = "& &     &   &";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, AMPERSAND);
-        assert_eq!(tokens[1].ttype, AMPERSAND);
-        assert_eq!(tokens[2].ttype, AMPERSAND);
-        assert_eq!(tokens[3].ttype, AMPERSAND);
+        assert_eq!(tokens[0].ttype, Ampersand);
+        assert_eq!(tokens[1].ttype, Ampersand);
+        assert_eq!(tokens[2].ttype, Ampersand);
+        assert_eq!(tokens[3].ttype, Ampersand);
     }
 
     #[test]
@@ -226,15 +226,15 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, AMPERSAND);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Ampersand);
         assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
-        assert_eq!(tokens[4].ttype, AMPERSAND);
+        assert_eq!(tokens[3].ttype, Word);
+        assert_eq!(tokens[4].ttype, Ampersand);
         assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, WORD);
+        assert_eq!(tokens[5].ttype, Word);
     }
 
     #[test]
@@ -243,13 +243,13 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, AMPERSAND);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, Ampersand);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
-        assert_eq!(tokens[3].ttype, AMPERSAND);
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, Ampersand);
         assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -257,10 +257,10 @@ mod lexer_tests {
         let line = "&& &&     &&   &&";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, AND);
-        assert_eq!(tokens[1].ttype, AND);
-        assert_eq!(tokens[2].ttype, AND);
-        assert_eq!(tokens[3].ttype, AND);
+        assert_eq!(tokens[0].ttype, And);
+        assert_eq!(tokens[1].ttype, And);
+        assert_eq!(tokens[2].ttype, And);
+        assert_eq!(tokens[3].ttype, And);
     }
 
     #[test]
@@ -269,15 +269,15 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, AND);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, And);
         assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, WORD);
+        assert_eq!(tokens[2].ttype, Word);
         assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, WORD);
-        assert_eq!(tokens[4].ttype, AND);
+        assert_eq!(tokens[3].ttype, Word);
+        assert_eq!(tokens[4].ttype, And);
         assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, WORD);
+        assert_eq!(tokens[5].ttype, Word);
     }
 
     #[test]
@@ -286,13 +286,13 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, WORD);
-        assert_eq!(tokens[1].ttype, AND);
+        assert_eq!(tokens[0].ttype, Word);
+        assert_eq!(tokens[1].ttype, And);
         assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, WORD);
-        assert_eq!(tokens[3].ttype, AND);
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, And);
         assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, WORD);
+        assert_eq!(tokens[4].ttype, Word);
     }
 
     #[test]
@@ -300,10 +300,10 @@ mod lexer_tests {
         let line = "<< >>     <<   >>";
 
         let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, LESSLESS);
-        assert_eq!(tokens[1].ttype, GREATGREAT);
-        assert_eq!(tokens[2].ttype, LESSLESS);
-        assert_eq!(tokens[3].ttype, GREATGREAT);
+        assert_eq!(tokens[0].ttype, LessLess);
+        assert_eq!(tokens[1].ttype, GreatGreat);
+        assert_eq!(tokens[2].ttype, LessLess);
+        assert_eq!(tokens[3].ttype, GreatGreat);
     }
 
     #[test]
@@ -312,9 +312,9 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "test");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "\" Samini \"");
-        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[1].ttype, Word);
     }
 
     #[test]
@@ -323,7 +323,7 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "test\" Samini \"test");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
     }
 
     #[test]
@@ -332,7 +332,7 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "Unclosed quotes");
-        assert_eq!(tokens[0].ttype, ERROR);
+        assert_eq!(tokens[0].ttype, Error);
     }
 
     #[test]
@@ -341,9 +341,9 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "test");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
         assert_eq!(tokens[1].literal, "' Samini '");
-        assert_eq!(tokens[1].ttype, WORD);
+        assert_eq!(tokens[1].ttype, Word);
     }
 
     #[test]
@@ -352,7 +352,7 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "test' Samini 'test");
-        assert_eq!(tokens[0].ttype, WORD);
+        assert_eq!(tokens[0].ttype, Word);
     }
 
     #[test]
@@ -361,6 +361,26 @@ mod lexer_tests {
 
         let tokens = lexer::lex(line);
         assert_eq!(tokens[0].literal, "Unclosed quotes");
-        assert_eq!(tokens[0].ttype, ERROR);
+        assert_eq!(tokens[0].ttype, Error);
+    }
+
+    #[test]
+    fn parentheses() {
+        let line = "(ls -l) && (echo test)";
+
+        let tokens = lexer::lex(line);
+        assert_eq!(tokens[0].ttype, LeftParen);
+        assert_eq!(tokens[1].literal, "ls");
+        assert_eq!(tokens[1].ttype, Word);
+        assert_eq!(tokens[2].literal, "-l");
+        assert_eq!(tokens[2].ttype, Word);
+        assert_eq!(tokens[3].ttype, RightParen);
+        assert_eq!(tokens[4].ttype, And);
+        assert_eq!(tokens[5].ttype, LeftParen);
+        assert_eq!(tokens[6].literal, "echo");
+        assert_eq!(tokens[6].ttype, Word);
+        assert_eq!(tokens[7].literal, "test");
+        assert_eq!(tokens[7].ttype, Word);
+        assert_eq!(tokens[8].ttype, RightParen);
     }
 }
