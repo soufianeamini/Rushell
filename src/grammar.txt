@@ -10,7 +10,7 @@
           | <PIPELINE> ';' <PIPELINE>
           | <PIPELINE>
 
-<PIPELINE> ::= <COMMAND> ('|'  <COMMAND>)*
+<PIPELINE> ::= <COMMAND> ('|' <COMMAND>)*
 
 <COMMAND> ::=  <SIMPLE-COMMAND>
             |  <SHELL-COMMAND>

@@ -2,3 +2,7 @@ The plan is: Lexer -> Expansion -> Delete Quotes (', ") -> File handling -> Exec
 
 < in cat | cat > out
 
+echo test | (cat | cat)
+
+echo test& cat file
+
