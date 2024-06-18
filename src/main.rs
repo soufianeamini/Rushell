@@ -9,6 +9,11 @@ fn main() {
         let line = rl.readline("> ");
         match line {
             Ok(line) => {
+                rl.add_history_entry(line.clone()).unwrap_or_else(|_| {
+                    eprintln!("WARNING: couldn't add command to history");
+                    false
+                });
+                let line = line.trim();
                 let tokens_v2 = lexer::lex(line.as_bytes());
                 println!("{tokens_v2:#?}");
             }

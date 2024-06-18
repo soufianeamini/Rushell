@@ -100,4 +100,3 @@ pub fn lex(line: &[u8]) -> Result<Vec<Token>, Box<dyn Error>> {
     }
     Ok(tokens)
 }
-
