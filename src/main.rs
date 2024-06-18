@@ -9,10 +9,8 @@ fn main() {
         let line = rl.readline("> ");
         match line {
             Ok(line) => {
-                let tokens_v2 = lexer::lex_v2(line.as_bytes());
+                let tokens_v2 = lexer::lex(line.as_bytes());
                 println!("{tokens_v2:#?}");
-                // let tokens = lexer::lex(&line);
-                // println!("{tokens:#?}");
             }
             Err(e) => match e.to_string().as_str() {
                 "Interrupted" => continue,
