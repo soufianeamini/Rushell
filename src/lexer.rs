@@ -1,6 +1,106 @@
-use std::{iter::Peekable, str::Chars};
+use std::{error::Error, iter::Peekable, str::Chars};
 
 use TokenType::*;
+
+#[derive(Debug)]
+pub enum TokenV2<'a> {
+    Word(&'a str),
+    Pipe,
+    Ampersand,
+    Less,
+    Great,
+    LessLess,
+    GreatGreat,
+    Semicolon,
+    Or,
+    And,
+    LeftParen,
+    RightParen,
+    Error(String),
+}
+
+#[derive(Debug)]
+pub struct Token {
+    pub literal: String,
+    pub ttype: TokenType,
+}
+
+impl Token {
+    fn new(literal: &str, ttype: TokenType) -> Token {
+        Token {
+            literal: String::from(literal),
+            ttype,
+        }
+    }
+}
+
+pub fn lex_v2(line: &[u8]) -> Result<Vec<TokenV2>, Box<dyn Error>> {
+    let mut tokens: Vec<TokenV2> = Vec::new();
+    let mut it = line.iter().enumerate();
+    let mut word_index = (false, 0);
+
+    while let Some((i, char)) = it.next() {
+        match char {
+            b'&' | b'|' | b'<' | b'>' | b';' | b'(' | b')' | b' ' if word_index.0 => {
+                let str_slice = std::str::from_utf8(&line[word_index.1..i])?;
+                tokens.push(TokenV2::Word(str_slice));
+                word_index.0 = false;
+            }
+            _ => (),
+        }
+        match char {
+            b'&' => {
+                if let Some(b'&') = line.get(i + 1) {
+                    tokens.push(TokenV2::And);
+                    it.next();
+                } else {
+                    tokens.push(TokenV2::Ampersand)
+                }
+            }
+            b'|' => {
+                if let Some(b'|') = line.get(i + 1) {
+                    tokens.push(TokenV2::Or);
+                    it.next();
+                } else {
+                    tokens.push(TokenV2::Pipe)
+                }
+            }
+            b'<' => {
+                if let Some(b'<') = line.get(i + 1) {
+                    tokens.push(TokenV2::GreatGreat);
+                    it.next();
+                } else {
+                    tokens.push(TokenV2::Great)
+                }
+            }
+            b'>' => {
+                if let Some(b'>') = line.get(i + 1) {
+                    tokens.push(TokenV2::GreatGreat);
+                    it.next();
+                } else {
+                    tokens.push(TokenV2::Great)
+                }
+            }
+            b'"' | b'\'' => {
+                unimplemented!()
+            }
+            b';' => tokens.push(TokenV2::Semicolon),
+            b'(' => tokens.push(TokenV2::LeftParen),
+            b')' => tokens.push(TokenV2::LeftParen),
+            b' ' => (),
+            _ => match word_index {
+                (false, _) => word_index = (true, i),
+                (true, _) => continue,
+            },
+        }
+    }
+
+    if word_index.0 {
+        let str_slice = std::str::from_utf8(&line[word_index.1..])?;
+        tokens.push(TokenV2::Word(str_slice));
+    }
+    Ok(tokens)
+}
 
 pub fn lex(line: &str) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
@@ -71,21 +171,6 @@ pub enum TokenType {
     LeftParen,
     RightParen,
     Error,
-}
-
-#[derive(Debug)]
-pub struct Token {
-    pub literal: String,
-    pub ttype: TokenType,
-}
-
-impl Token {
-    fn new(literal: &str, ttype: TokenType) -> Token {
-        Token {
-            literal: String::from(literal),
-            ttype,
-        }
-    }
 }
 
 struct LexerOpt {
