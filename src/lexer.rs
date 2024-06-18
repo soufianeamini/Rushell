@@ -1,6 +1,18 @@
+use core::fmt;
 use std::{error::Error, iter::Peekable, str::Chars};
 
 use TokenType::*;
+
+#[derive(Debug)]
+struct LexerError(String);
+
+impl fmt::Display for LexerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Error: {}", self.0)
+    }
+}
+
+impl Error for LexerError {}
 
 #[derive(Debug)]
 pub enum TokenV2<'a> {
@@ -82,7 +94,12 @@ pub fn lex_v2(line: &[u8]) -> Result<Vec<TokenV2>, Box<dyn Error>> {
                 }
             }
             b'"' | b'\'' => {
-                unimplemented!()
+                match word_index {
+                    (false, _) => word_index = (true, i),
+                    (true, _) => (),
+                }
+                let error_handler = || Box::new(LexerError(String::from("Unclosed Quotes")));
+                it.find(|p| p.1 == char).ok_or_else(error_handler)?;
             }
             b';' => tokens.push(TokenV2::Semicolon),
             b'(' => tokens.push(TokenV2::LeftParen),
