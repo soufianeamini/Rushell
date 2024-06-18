@@ -67,10 +67,10 @@ pub fn lex_v2(line: &[u8]) -> Result<Vec<TokenV2>, Box<dyn Error>> {
             }
             b'<' => {
                 if let Some(b'<') = line.get(i + 1) {
-                    tokens.push(TokenV2::GreatGreat);
+                    tokens.push(TokenV2::LessLess);
                     it.next();
                 } else {
-                    tokens.push(TokenV2::Great)
+                    tokens.push(TokenV2::Less)
                 }
             }
             b'>' => {

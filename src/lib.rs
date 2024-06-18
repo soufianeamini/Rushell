@@ -2,168 +2,157 @@ pub mod lexer;
 
 #[cfg(test)]
 mod lexer_tests {
-    use crate::lexer::TokenType::*;
+    use std::error::Error;
+
+    use crate::lexer::{TokenType::*, TokenV2};
 
     use super::*;
 
     #[test]
-    fn words_only() {
+    fn words_only() -> Result<(), Box<dyn Error>> {
         let line = "echo ls";
 
-        let tokens = lexer::lex(line);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
 
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, Word);
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Word("ls")));
+        Ok(())
     }
 
     #[test]
-    fn words_more_than_one_space() {
+    fn words_more_than_one_space() -> Result<(), Box<dyn Error>> {
         let line = "echo       ls";
 
-        let tokens = lexer::lex(line);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
 
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, Word);
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Word("ls")));
+        Ok(())
     }
 
     #[test]
-    fn words_trailing_leading_spaces() {
+    fn words_trailing_leading_spaces() -> Result<(), Box<dyn Error>> {
         let line = "    echo ls   ";
 
-        let tokens = lexer::lex(line);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
 
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, Word);
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Word("ls")));
+        Ok(())
     }
 
     #[test]
-    fn pipes_only() {
+    fn pipes_only() -> Result<(), Box<dyn Error>> {
         let line = "| |     |   |";
 
-        let tokens = lexer::lex(line);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
         for i in 0..4 {
-            assert_eq!(tokens[i].ttype, Pipe);
+            assert!(matches!(tokens[i], TokenV2::Pipe));
         }
+        Ok(())
     }
 
     #[test]
-    fn words_and_pipes() {
+    fn words_and_pipes() -> Result<(), Box<dyn Error>> {
         let line = "cat Cargo.toml | grep rusty";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].literal, "Cargo.toml");
-        assert_eq!(tokens[1].ttype, Word);
-        assert_eq!(tokens[2].ttype, Pipe);
-        assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, Word);
-        assert_eq!(tokens[4].literal, "rusty");
-        assert_eq!(tokens[4].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+
+        assert!(matches!(tokens[0], TokenV2::Word("cat")));
+        assert!(matches!(tokens[1], TokenV2::Word("Cargo.toml")));
+        assert!(matches!(tokens[2], TokenV2::Pipe));
+        assert!(matches!(tokens[3], TokenV2::Word("grep")));
+        assert!(matches!(tokens[4], TokenV2::Word("rusty")));
+        Ok(())
     }
 
     #[test]
-    fn sticky_pipes() {
+    fn sticky_pipes() -> Result<(), Box<dyn Error>> {
         let line = "echo|echo";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].ttype, Pipe);
-        assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Pipe));
+        assert!(matches!(tokens[2], TokenV2::Word("echo")));
+        Ok(())
     }
 
     #[test]
-    fn redirections_only() {
+    fn redirections_only() -> Result<(), Box<dyn Error>> {
         let line = "< >     <   >";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, Less);
-        assert_eq!(tokens[1].ttype, Great);
-        assert_eq!(tokens[2].ttype, Less);
-        assert_eq!(tokens[3].ttype, Great);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Less));
+        assert!(matches!(tokens[1], TokenV2::Great));
+        assert!(matches!(tokens[2], TokenV2::Less));
+        assert!(matches!(tokens[3], TokenV2::Great));
+        Ok(())
     }
 
     #[test]
-    fn words_and_redirections() {
+    fn words_and_redirections() -> Result<(), Box<dyn Error>> {
         let line = "cat  < Cargo.toml grep > rusty";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].ttype, Less);
-        assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, Word);
-        assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, Word);
-        assert_eq!(tokens[4].ttype, Great);
-        assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("cat")));
+        assert!(matches!(tokens[1], TokenV2::Less));
+        assert!(matches!(tokens[2], TokenV2::Word("Cargo.toml")));
+        assert!(matches!(tokens[3], TokenV2::Word("grep")));
+        assert!(matches!(tokens[4], TokenV2::Great));
+        assert!(matches!(tokens[5], TokenV2::Word("rusty")));
+        Ok(())
     }
 
     #[test]
-    fn sticky_redirections() {
+    fn sticky_redirections() -> Result<(), Box<dyn Error>> {
         let line = "echo<echo>echo";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].ttype, Less);
-        assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, Word);
-        assert_eq!(tokens[3].ttype, Great);
-        assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Less));
+        assert!(matches!(tokens[2], TokenV2::Word("echo")));
+        assert!(matches!(tokens[3], TokenV2::Great));
+        assert!(matches!(tokens[4], TokenV2::Word("echo")));
+        Ok(())
     }
 
     #[test]
-    fn semicolons_only() {
+    fn semicolons_only() -> Result<(), Box<dyn Error>> {
         let line = "; ;     ;   ;";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, Semicolon);
-        assert_eq!(tokens[1].ttype, Semicolon);
-        assert_eq!(tokens[2].ttype, Semicolon);
-        assert_eq!(tokens[3].ttype, Semicolon);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Semicolon));
+        assert!(matches!(tokens[1], TokenV2::Semicolon));
+        assert!(matches!(tokens[2], TokenV2::Semicolon));
+        assert!(matches!(tokens[3], TokenV2::Semicolon));
+        Ok(())
     }
 
     #[test]
-    fn words_and_semicolons() {
+    fn words_and_semicolons() -> Result<(), Box<dyn Error>> {
         let line = "cat  ; Cargo.toml grep ; rusty";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "cat");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].ttype, Semicolon);
-        assert_eq!(tokens[2].literal, "Cargo.toml");
-        assert_eq!(tokens[2].ttype, Word);
-        assert_eq!(tokens[3].literal, "grep");
-        assert_eq!(tokens[3].ttype, Word);
-        assert_eq!(tokens[4].ttype, Semicolon);
-        assert_eq!(tokens[5].literal, "rusty");
-        assert_eq!(tokens[5].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("cat")));
+        assert!(matches!(tokens[1], TokenV2::Semicolon));
+        assert!(matches!(tokens[2], TokenV2::Word("Cargo.toml")));
+        assert!(matches!(tokens[3], TokenV2::Word("grep")));
+        assert!(matches!(tokens[4], TokenV2::Semicolon));
+        assert!(matches!(tokens[5], TokenV2::Word("rusty")));
+        Ok(())
     }
 
     #[test]
-    fn sticky_semicolons() {
+    fn sticky_semicolons() -> Result<(), Box<dyn Error>> {
         let line = "echo;echo;echo";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "echo");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].ttype, Semicolon);
-        assert_eq!(tokens[2].literal, "echo");
-        assert_eq!(tokens[2].ttype, Word);
-        assert_eq!(tokens[3].ttype, Semicolon);
-        assert_eq!(tokens[4].literal, "echo");
-        assert_eq!(tokens[4].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("echo")));
+        assert!(matches!(tokens[1], TokenV2::Semicolon));
+        assert!(matches!(tokens[2], TokenV2::Word("echo")));
+        assert!(matches!(tokens[3], TokenV2::Semicolon));
+        assert!(matches!(tokens[4], TokenV2::Word("echo")));
+        Ok(())
     }
 
     #[test]
