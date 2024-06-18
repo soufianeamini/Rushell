@@ -1,1 +1,4 @@
 The plan is: Lexer -> Expansion -> Delete Quotes (', ") -> File handling -> Execution
+
+< in cat | cat > out
+

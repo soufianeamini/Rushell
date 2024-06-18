@@ -1,3 +1,26 @@
+<SHELL-COMMAND> ::=  <COMMAND-GROUP> | <SUBSHELL>
+
+<COMMAND-GROUP> ::= <COMMAND-EXEC>
+          | <COMMAND-EXEC> '&'
+          | <COMMAND-EXEC> ';'
+
+<COMMAND-EXEC> ::= <PIPELINE> '&&' <PIPELINE>
+          | <PIPELINE> '||' <PIPELINE>
+          | <PIPELINE> '&' <PIPELINE>
+          | <PIPELINE> ';' <PIPELINE>
+          | <PIPELINE>
+
+<PIPELINE> ::= <COMMAND> ('|'  <COMMAND>)*
+
+<COMMAND> ::=  <SIMPLE-COMMAND>
+            |  <SHELL-COMMAND>
+
+<SIMPLE-COMMAND> ::=  <SIMPLE-COMMAND-ELEMENT> (<SIMPLE-COMMAND-ELEMENT>)*
+
+<SIMPLE-COMMAND-ELEMENT> ::= <WORD>
+                          |  <ASSIGNMENT-WORD>
+                          |  <REDIRECTION>
+
 <ASSIGNMENT-WORD> ::= <WORD> '=' <WORD>
 
 <REDIRECTION> ::=  '>' <WORD>
@@ -5,35 +28,7 @@
                 |  '>>' <WORD>
                 |  '<<' <WORD>
 
-<SIMPLE-COMMAND-ELEMENT> ::= <WORD>
-                          |  <ASSIGNMENT-WORD>
-                          |  <REDIRECTION>
-
-<REDIRECTION-LIST> ::= <REDIRECTION> (<REDIRECTION>)*
-
-<SIMPLE-COMMAND> ::=  <SIMPLE-COMMAND-ELEMENT> (<SIMPLE-COMMAND-ELEMENT>)*
-
-<COMMAND> ::=  <SIMPLE-COMMAND>
-            |  <SHELL-COMMAND>
-            |  <SHELL-COMMAND> <REDIRECTION-LIST>
-
-<SHELL-COMMAND> ::=  <SUBSHELL>
-
 <SUBSHELL> ::=  '(' <COMMAND-GROUP> ')'
-<COMMAND-GROUP> ::= <COMMAND-EXEC>
-          | <COMMAND-EXEC> '&'
-          | <COMMAND-EXEC> ';'
-
-<COMMAND-EXEC> ::= <PIPELINE-COMMAND> '&&' <PIPELINE-COMMAND>
-          | <PIPELINE-COMMAND> '||' <PIPELINE-COMMAND>
-          | <PIPELINE-COMMAND> '&' <PIPELINE-COMMAND>
-          | <PIPELINE-COMMAND> ';' <PIPELINE-COMMAND>
-          | <PIPELINE-COMMAND>
-
-<PIPELINE-COMMAND> ::= <PIPELINE>
-
-<PIPELINE> ::= <PIPELINE> '|'  <PIPELINE>
-       |  <COMMAND>
 
 <WORD> ::= <ALPHA> | <WORD> <ALPHA> | <WORD> '_'
 
