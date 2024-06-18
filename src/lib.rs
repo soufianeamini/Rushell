@@ -295,69 +295,71 @@ mod lexer_tests {
     }
 
     #[test]
-    fn double_quotes_complex() {
+    fn double_quotes_complex() -> Result<(), Box<dyn Error>> {
         let line = "test\" Samini \"test";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "test\" Samini \"test");
-        assert_eq!(tokens[0].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("test\" Samini \"test")));
+        Ok(())
     }
 
     #[test]
-    fn double_quotes_error() {
+    fn double_quotes_error() -> Result<(), Box<dyn Error>> {
         let line = "test\" Samini test";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "Unclosed quotes");
-        assert_eq!(tokens[0].ttype, Error);
+        let tokens = lexer::lex_v2(line.as_bytes());
+        match tokens {
+            Ok(_) => panic!(),
+            Err(_) => (),
+        }
+        Ok(())
     }
 
     #[test]
-    fn single_quotes() {
+    fn single_quotes() -> Result<(), Box<dyn Error>> {
         let line = "test ' Samini '";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "test");
-        assert_eq!(tokens[0].ttype, Word);
-        assert_eq!(tokens[1].literal, "' Samini '");
-        assert_eq!(tokens[1].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("test")));
+        assert!(matches!(tokens[1], TokenV2::Word("' Samini '")));
+        Ok(())
     }
 
     #[test]
-    fn single_quotes_complex() {
+    fn single_quotes_complex() -> Result<(), Box<dyn Error>> {
         let line = "test' Samini 'test";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "test' Samini 'test");
-        assert_eq!(tokens[0].ttype, Word);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::Word("test' Samini 'test")));
+        Ok(())
     }
 
     #[test]
-    fn single_quotes_error() {
+    fn single_quotes_error() -> Result<(), Box<dyn Error>> {
         let line = "test' Samini test";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].literal, "Unclosed quotes");
-        assert_eq!(tokens[0].ttype, Error);
+        let tokens = lexer::lex_v2(line.as_bytes());
+        match tokens {
+            Ok(_) => panic!(),
+            Err(_) => (),
+        }
+        Ok(())
     }
 
     #[test]
-    fn parentheses() {
-        let line = "(ls -l) && (echo test)";
+    fn parentheses() -> Result<(), Box<dyn Error>> {
+        let line = "(ls -l) && ( echo test )";
 
-        let tokens = lexer::lex(line);
-        assert_eq!(tokens[0].ttype, LeftParen);
-        assert_eq!(tokens[1].literal, "ls");
-        assert_eq!(tokens[1].ttype, Word);
-        assert_eq!(tokens[2].literal, "-l");
-        assert_eq!(tokens[2].ttype, Word);
-        assert_eq!(tokens[3].ttype, RightParen);
-        assert_eq!(tokens[4].ttype, And);
-        assert_eq!(tokens[5].ttype, LeftParen);
-        assert_eq!(tokens[6].literal, "echo");
-        assert_eq!(tokens[6].ttype, Word);
-        assert_eq!(tokens[7].literal, "test");
-        assert_eq!(tokens[7].ttype, Word);
-        assert_eq!(tokens[8].ttype, RightParen);
+        let tokens = lexer::lex_v2(line.as_bytes())?;
+        assert!(matches!(tokens[0], TokenV2::LeftParen));
+        assert!(matches!(tokens[1], TokenV2::Word("ls")));
+        assert!(matches!(tokens[2], TokenV2::Word("-l")));
+        assert!(matches!(tokens[3], TokenV2::RightParen));
+        assert!(matches!(tokens[4], TokenV2::And));
+        assert!(matches!(tokens[5], TokenV2::LeftParen));
+        assert!(matches!(tokens[6], TokenV2::Word("echo")));
+        assert!(matches!(tokens[7], TokenV2::Word("test")));
+        assert!(matches!(tokens[8], TokenV2::RightParen));
+        Ok(())
     }
 }

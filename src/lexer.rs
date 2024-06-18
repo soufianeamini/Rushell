@@ -28,7 +28,6 @@ pub enum TokenV2<'a> {
     And,
     LeftParen,
     RightParen,
-    Error(String),
 }
 
 #[derive(Debug)]
@@ -103,7 +102,7 @@ pub fn lex_v2(line: &[u8]) -> Result<Vec<TokenV2>, Box<dyn Error>> {
             }
             b';' => tokens.push(TokenV2::Semicolon),
             b'(' => tokens.push(TokenV2::LeftParen),
-            b')' => tokens.push(TokenV2::LeftParen),
+            b')' => tokens.push(TokenV2::RightParen),
             b' ' => (),
             _ => match word_index {
                 (false, _) => word_index = (true, i),
